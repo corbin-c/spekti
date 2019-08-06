@@ -16,3 +16,8 @@ Basically, Spekti is *yet another RSS aggregator*, with a few key features:
 * note-taking
 
 More data sources (Twitter, Fediverse, etc.) might be added later.
+
+Unless all your data sources provides CORS headers, you'll need a CORS-Proxy.
+Spekti default proxy is [CORS-Anywhere](https://github.com/Rob--W/cors-anywhere/)
+hosted on Heroku and developped by Rob Wu. Thank you Rob ! Consider changing
+this parameter to provide your own proxy.
