@@ -3,7 +3,7 @@ const FEED_ELEMENTS = [
   {title:["title"]},
   {link:["link"]},
   {img:["enclosure"]},
-  {abstract:["description","content:encoded"]},
+  {abstract:["content:encoded","description"]},
   {date:["pubDate","dc:date"]},
   {author:["author","dc:creator"]}];
 
@@ -31,6 +31,7 @@ function Rss(url) {
           }
         }
       }
+      element = (element.img == "") ? this.getImage(element):element;
       this.feed.push(element);
     }
   }
@@ -48,11 +49,26 @@ function Rss(url) {
         element = div.value;
         div.remove();
       } else {
-        element = element.innerHTML;
+        element = element.textContent;
       }
       return element;
     } catch {
       throw new Error("Element not found");
+    }
+  }
+  this.getImage = function(feed_item) {
+    try {
+      let parsed_abstract = new DOMParser()
+                            .parseFromString(feed_item.abstract, "text/html");
+      let img = parsed_abstract.querySelector("img");
+      feed_item.img = img.getAttribute("src");
+      img.remove();
+      feed_item.abstract = parsed_abstract
+                            .documentElement.querySelector("body").innerHTML;
+    } catch {
+      console.warn("No image found");
+    } finally {
+      return feed_item;
     }
   }
   this.dateParser = function(dateString) {
