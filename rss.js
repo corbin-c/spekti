@@ -41,10 +41,10 @@ function Rss(url) {
       if (selector == "enclosure") {
         element = element.getAttribute("url");
       } else if (selector.toLowerCase().indexOf("date") >= 0) {
-        element = this.dateParser(element.innerHTML)
+        element = this.dateParser(element.innerHTML);
       } else if ((selector == "content:encoded")||(selector == "description")) {
         element = element.textContent;
-        let div = document.createElement("textarea")
+        let div = document.createElement("textarea");
         div.innerHTML = decodeURIComponent(element);
         element = div.value;
         div.remove();
@@ -81,4 +81,4 @@ function Rss(url) {
     return dateOut;
   }
 }
-export { Rss }
+export { Rss };
