@@ -1,7 +1,7 @@
 const CORS_PROXY = "https://cors-anywhere.herokuapp.com/";
 const FEED_ELEMENTS = [
   {title:["title"]},
-  {link:["link","guid"]},
+  {link:["link"]},
   {img:["enclosure"]},
   {abstract:["description","content:encoded"]},
   {date:["pubDate","dc:date"]},
@@ -27,7 +27,7 @@ function Rss(url) {
             element[Object.keys(j)[0]] = this.getElement(i,k);
             break;
           } catch {
-            console.warn("Missing "+k+" element while building feed");
+            console.warn("Missing element while building feed");
           }
         }
       }
@@ -35,7 +35,34 @@ function Rss(url) {
     }
   }
   this.getElement = function(item,selector) {
-    return item.getElementsByTagName(selector)[0].innerHTML;
+    try {
+      let element = item.getElementsByTagName(selector)[0];
+      if (selector == "enclosure") {
+        element = element.getAttribute("url");
+      } else if (selector.toLowerCase().indexOf("date") >= 0) {
+        element = this.dateParser(element.innerHTML)
+      } else if ((selector == "content:encoded")||(selector == "description")) {
+        element = element.textContent;
+        let div = document.createElement("textarea")
+        div.innerHTML = decodeURIComponent(element);
+        element = div.value;
+        div.remove();
+      } else {
+        element = element.innerHTML;
+      }
+      return element;
+    } catch {
+      throw new Error("Element not found");
+    }
+  }
+  this.dateParser = function(dateString) {
+    let dateOut = new Date(dateString);
+    if (dateOut == "Invalid Date") {
+      dateString = dateString.split(", ")[1];
+      dateString = dateString.replace(/ \w+$/,"");
+      dateOut = new Date(dateString);
+    } // This would need improvements to take care of all date formats
+    return dateOut;
   }
 }
 export { Rss }
