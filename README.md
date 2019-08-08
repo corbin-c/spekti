@@ -19,5 +19,5 @@ More data sources (Twitter, Fediverse, etc.) might be added later.
 
 Unless all your data sources provides CORS headers (which is very unlikely),
 you'll need a CORS-Proxy. Spekti default proxy is [CORS-Anywhere](https://github.com/Rob--W/cors-anywhere/)
-hosted on Heroku and developped by Rob Wu. (Thank you Rob !) However, please
+hosted on Heroku and developed by Rob Wu. (Thank you Rob !) However, please
 consider changing this parameter to provide your own proxy.
