@@ -6,7 +6,6 @@ const FEED_ELEMENTS = [
   {abstract:["content:encoded","description"]},
   {date:["pubDate","dc:date"]},
   {author:["author","dc:creator"]}];
-
 let Rss = class {
   constructor(url) {
     this.url = url;
