@@ -7,16 +7,18 @@ const FEED_ELEMENTS = [
   {date:["pubDate","dc:date"]},
   {author:["author","dc:creator"]}];
 
-function Rss(url) {
-  this.url = url;
-  this.feed = [];
-  this.loadFeed = async function() {
+let Rss = class {
+  constructor(url) {
+    this.url = url;
+    this.feed = [];
+  }
+  async loadFeed() {
     let feed = await fetch(CORS_PROXY+this.url);
     feed = await feed.text();
     feed = (new DOMParser()).parseFromString(feed, "text/xml");
     this.parseFeed(feed);
   }
-  this.parseFeed = function(feed) {
+  parseFeed(feed) {
     let items = [...feed.querySelectorAll("item")];
     for (let i of items) {
       let element = {};
@@ -35,7 +37,7 @@ function Rss(url) {
       this.feed.push(element);
     }
   }
-  this.getElement = function(item,selector) {
+  getElement(item,selector) {
     try {
       let element = item.getElementsByTagName(selector)[0];
       if (selector == "enclosure") {
@@ -56,7 +58,7 @@ function Rss(url) {
       throw new Error("Element not found");
     }
   }
-  this.getImage = function(feed_item) {
+  getImage(feed_item) {
     try {
       let parsed_abstract = new DOMParser()
                             .parseFromString(feed_item.abstract, "text/html");
@@ -71,7 +73,7 @@ function Rss(url) {
       return feed_item;
     }
   }
-  this.dateParser = function(dateString) {
+  dateParser(dateString) {
     let dateOut = new Date(dateString);
     if (dateOut == "Invalid Date") {
       dateString = dateString.split(", ")[1];
