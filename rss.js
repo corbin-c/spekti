@@ -14,7 +14,7 @@ let Rss = class {
   async loadFeed() {
     let feed = await fetch(CORS_PROXY+this.url);
     feed = await feed.text();
-    feed = (new DOMParser()).parseFromString(feed, "text/xml");
+    feed = new DOMParser().parseFromString(feed, "text/xml");
     this.parseFeed(feed);
   }
   parseFeed(feed) {
