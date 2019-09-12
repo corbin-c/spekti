@@ -21,7 +21,7 @@ let Rss = class {
     let items = [...feed.querySelectorAll("item")];
     for (let i of items) {
       let element = {};
-      for (let j of FEED_ELEMENTS) {
+      FEED_ELEMENTS.map(j => {
         element[Object.keys(j)[0]] = "";
         for (let k of j[Object.keys(j)[0]]) {
           try {
@@ -31,7 +31,7 @@ let Rss = class {
             console.warn("Missing element while building feed");
           }
         }
-      }
+      });
       element = (element.img == "") ? this.getImage(element):element;
       this.feed.push(element);
     }
@@ -42,7 +42,7 @@ let Rss = class {
       if (selector == "enclosure") {
         element = element.getAttribute("url");
       } else if (selector.toLowerCase().indexOf("date") >= 0) {
-        element = this.dateParser(element.innerHTML);
+        element = this.dateParser(element.textContent);
       } else if ((selector == "content:encoded")||(selector == "description")) {
         element = element.textContent;
         let div = document.createElement("textarea");
