@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta http-equiv="content-type" content="text/html; charset=UTF-8">
+    <meta charset="utf-8">
+    <title>SPEKTI</title>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.0/css/bootstrap.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
+    <link rel="stylesheet" href="/spekti/vue/spekti.css">
+  </head>
+  <body>
+    <div class="spinner-grow text-info" role="status"><span class="sr-only">Loading...</span></div>
+    <div id="app" class="container-fluid invisible">
+      <nav class="row navbar sticky-top navbar-expand navbar-light bg-light border-bottom border-info">
+        <h2 class="text-info" v-on:click="hideAll">{{ appName }}</h2>
+        <ul class="navbar-nav ml-auto" v-if="spekti !== false">
+          <li class="nav-item">
+            <a class="nav-link" title="Manage sources" href="#" v-on:click="setModal('sources')">Sources</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" title="Manage tags" href="#" v-on:click="setModal('tags')">Tags</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" title="Manage notes" href="#" v-on:click="setModal('notes')">Notes</a>
+          </li>
+        </ul>
+      </nav>
+      <app-home v-bind:update="lastUpdate" v-bind:tag="tag"></app-home>
+      <app-modal v-bind:content="modal" v-bind:update="lastUpdate"></app-modal>
+      <footer class="fixed-bottom text-right border-top border-info p-1 bg-light">
+        <small class="p-2">
+          <a href="https://github.com/corbin-c/spekti" title="Spekti repository by corbin-c on Github">Contribute on Github</a>
+        </small>
+      </footer>
+    </div>
+  </body>
+<script src="/spekti/vue/hello.all.min.js"></script>
+<script type="module">
+import { home } from "/spekti/vue/home.vue.js";
+import { modal } from "/spekti/vue/modal.vue.js";
+hello.init({github:"e039324ddce920ed3111"});
+let app = new Vue({
+  el: '#app',
+  data: {
+    appName: "Spekti",
+    currentRoute: window.location.pathname.slice(11),
+    logged: false,
+    modal: false,
+    spekti: false,
+    tag: false,
+    lastUpdate: (new Date()).valueOf()
+  },
+  mounted() {
+    hello.on("auth.login", function(auth) {
+      app.logged = auth.authResponse.access_token;
+    });
+  },
+  created() {
+    this.$on("hideModal",this.hideModal);
+    this.$on("showModal",this.setModal);
+    this.$on("update",this.updateView);
+    this.$on("showTag",this.showTag);
+  },
+  components: {
+    "app-home": home,
+    "app-modal": modal,
+  },
+  methods: {
+    setModal(target) {
+      this.modal = target;
+    },
+    showTag(target) {
+      this.tag = target;
+    },
+    updateView() {
+      this.lastUpdate = (new Date()).valueOf();
+    },
+    hideModal() {
+      this.setModal(false);
+    },
+    hideArticle() {
+      this.$emit("closeFullArticle","");
+    },
+    hideTags() {
+      this.tag = false;
+    },
+    hideAll() {
+      this.hideArticle();
+      this.hideTags();
+    }
+  }
+});
+document.querySelector(".spinner-grow").remove();
+document.querySelector("#app").classList.remove("invisible");
+</script>
+</html>

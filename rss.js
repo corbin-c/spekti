@@ -6,6 +6,52 @@ const FEED_ELEMENTS = [
   {abstract:["content:encoded","description"]},
   {date:["pubDate","dc:date"]},
   {author:["author","dc:creator"]}];
+const dateParser = (dateString) => {
+  let dateOut = new Date(dateString);
+  if (dateOut == "Invalid Date") {
+    dateString = dateString.split(", ")[1];
+    dateString = dateString.replace(/ \w+$/,"");
+    dateOut = new Date(dateString);
+  } // This would need improvements to take care of all date formats
+  return dateOut;
+}
+const METHODS = {
+  enclosure: e => {
+    if ((e.getAttribute("type") !== null)
+      && (e.getAttribute("type").indexOf("image") >= 0)) {
+      return e.getAttribute("url");
+    } else {
+      return "";
+    }
+  },
+  "content:encoded": e => {
+    if (e.firstChild.nodeName == "#cdata-section") {
+      e = e.firstChild.data;
+      let div = document.createElement("p");
+      div.innerHTML = decodeURIComponent(e);
+      e = div.innerText;
+      div.remove();
+    } else {
+      e = e.textContent;
+      let div = document.createElement("p");
+      div.innerHTML = decodeURIComponent(e);
+      e = div.innerText;
+      div.remove();
+    }
+    return e;
+  },
+  description: e => {
+    e = e.textContent;
+    let div = document.createElement("p");
+    div.innerHTML = decodeURIComponent(e);
+    e = div.innerText;
+    div.remove();
+    return e;
+  },
+  pubDate: e => dateParser(e.textContent),
+  "dc:date": e => dateParser(e.textContent),
+  other: e => e.textContent
+}
 let Rss = class {
   constructor(url) {
     this.url = url;
@@ -32,54 +78,40 @@ let Rss = class {
           }
         }
       });
-      element = (element.img == "") ? this.getImage(element):element;
+      element.img = (element.img == "") ? this.getImage(i):element.img;
       this.feed.push(element);
     }
   }
   getElement(item,selector) {
     try {
       let element = item.getElementsByTagName(selector)[0];
-      if (selector == "enclosure") {
-        element = element.getAttribute("url");
-      } else if (selector.toLowerCase().indexOf("date") >= 0) {
-        element = this.dateParser(element.textContent);
-      } else if ((selector == "content:encoded")||(selector == "description")) {
-        element = element.textContent;
-        let div = document.createElement("textarea");
-        div.innerHTML = decodeURIComponent(element);
-        element = div.value;
-        div.remove();
+      if (typeof METHODS[selector] === "undefined") {
+        return METHODS.other(element);
       } else {
-        element = element.textContent;
+        return METHODS[selector](element);
       }
-      return element;
     } catch {
       throw new Error("Element not found");
     }
   }
   getImage(feed_item) {
     try {
-      let parsed_abstract = new DOMParser()
-                            .parseFromString(feed_item.abstract, "text/html");
-      let img = parsed_abstract.querySelector("img");
-      feed_item.img = img.getAttribute("src");
-      img.remove();
-      feed_item.abstract = parsed_abstract
-                            .documentElement.querySelector("body").innerHTML;
-    } catch {
-      console.warn("No image found");
-    } finally {
-      return feed_item;
+      let img = feed_item.querySelector("img");
+      return img.getAttribute("src");
+    } catch(e) {
+      try {
+        let content = feed_item.getElementsByTagName("content:encoded")[0];
+        if (content.firstChild.nodeName == "#cdata-section") {
+          content = content.firstChild.data;
+          content = new DOMParser()
+            .parseFromString(content, "text/html");
+          return this.getImage(content);
+        }
+      } catch {
+        console.warn("No image found");
+        return "";        
+      }
     }
-  }
-  dateParser(dateString) {
-    let dateOut = new Date(dateString);
-    if (dateOut == "Invalid Date") {
-      dateString = dateString.split(", ")[1];
-      dateString = dateString.replace(/ \w+$/,"");
-      dateOut = new Date(dateString);
-    } // This would need improvements to take care of all date formats
-    return dateOut;
   }
 }
 export { Rss };

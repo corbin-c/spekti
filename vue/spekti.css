@@ -1,0 +1,123 @@
+.spinner-grow {
+  display: block;
+  position: absolute;
+  top: calc(50vh - 5rem);
+  left: calc(50vw - 5rem);
+  width: 10rem;
+  height: 10rem;
+}
+.inline li {
+  display: inline;
+  list-style: none outside;
+}
+.btn svg {
+  width: 24px;
+  height: 24px;
+  fill: white;
+}
+.modal .badge svg {
+  width: 16px;
+  height: 16px;
+  fill: var(--danger);
+}
+.modal .badge {
+  border: 1px solid var(--danger);
+}
+.modal .badge:hover {
+  background: var(--danger);
+  cursor: pointer;
+}
+.modal .badge:hover svg {
+  fill: var(--white);
+}
+.btn-outline-info svg {
+  fill: var(--info);
+}
+.btn-outline-secondary svg {
+  fill: var(--secondary);
+}
+.btn:hover svg {
+  fill: white;
+}
+a {
+  color: var(--info);
+}
+a:hover {
+  color: #138496;
+}
+.fade-enter-active, .fade-leave-active {
+  transition: opacity 0.2s linear;
+}
+.fade-enter, .fade-leave-to {
+  opacity: 0;
+}
+.fade-enter-to, .fade-leave {
+  opacity: 1;
+}
+.modal-backdrop {
+  opacity: 0.5;
+}
+.modal-title {
+  text-transform: capitalize;
+}
+.modal-footer input {
+  width: 80%;
+}
+@media (min-width: 576px) {
+  .card-columns {
+    column-count: 1;
+  }
+}
+@media (min-width: 768px) {
+  .card-columns {
+    column-count: 2;
+  }
+}
+@media (min-width: 992px) {
+  .card-columns {
+    column-count: 3;
+  }
+}
+@media (min-width: 1200px) {
+  .card-columns {
+    column-count: 4;
+  }
+}
+.card .spinner-grow {
+  display: block;
+  position: relative;
+  width: 5rem;
+  height: 5rem;
+  top: initial;
+}
+#close {
+  position: fixed;
+  bottom: 3.4rem;
+  right: 3rem;
+  font-size: 1.5rem;
+  font-weight: 700;
+  line-height: 1;
+  color: white;
+}
+.card-body img {
+  display: block;
+  margin: auto;
+  max-width: 100%;
+  height: max-content;
+}
+.tagbar {
+  top: calc(4rem - 1px);
+  background: #f7f7f7;
+}
+button .hover {
+  display: none;
+}
+button:hover .hover {
+  display: block;
+}
+button .regular {
+  display: block;
+}
+button:hover .regular {
+  display: none;
+}

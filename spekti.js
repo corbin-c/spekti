@@ -1,4 +1,5 @@
 const GIST_DESC = "SpektiGist";
+
 let SpektiEntity = class {
   constructor(gist,file) {
     this.gist = gist;
@@ -28,12 +29,17 @@ let SpektiEntity = class {
     });
   }
 }
+
 let Tags = class extends SpektiEntity {
-  async tagArticle(url,...tag) {
+  async tagsAbout(url) {
+    let article = (await this.allContent).find(e => e.url == url);
+    return article;
+  }
+  async tagArticle(url,title,...tag) {
     console.info("adding tags "+tag.join(", ")+" to url "+url);
     let article = (await this.allContent).find(e => e.url == url);
     if (typeof article === "undefined") {
-      this.content.push({url,tags:[...tag]});
+      this.content.push({url,title,tags:[...tag]});
     } else {
       tag.map(e => {
         if (!article.tags.some(f => f==e)) {
@@ -68,6 +74,7 @@ let Tags = class extends SpektiEntity {
     });
   }
 }
+
 let Notes = class extends SpektiEntity {
   async makeNote(content,url=false) {
     console.info("adding note");
@@ -111,6 +118,7 @@ let Notes = class extends SpektiEntity {
     return (await this.allContent).filter(e => e.url == url);
   }
 }
+
 let Sources = class extends SpektiEntity {
   async addSource(url) {
     console.info("adding source "+url);
@@ -124,14 +132,16 @@ let Sources = class extends SpektiEntity {
     console.info("removing source "+url);
     let source = (await this.allContent).find(e => e == url);
     if (typeof source === "undefined") {
-      console.warn("article "+url+" not found, tag deletion aborted");
+      console.warn("source "+url+" not found, deletion aborted");
     } else {
       this.content = (await this.allContent).filter(e => e != url);
       await this.commitChanges();
     }
   }
 }
+
 const ENTITIES = { Tags, Notes, Sources };
+
 let Spekti = class {
   constructor(gist,entities) {
     this.gist = gist;
@@ -157,4 +167,5 @@ let Spekti = class {
     this.isReady();
   }
 }
+
 export { Spekti };
