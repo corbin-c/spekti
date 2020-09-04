@@ -27,25 +27,16 @@ const METHODS = {
   "content:encoded": e => {
     if (e.firstChild.nodeName == "#cdata-section") {
       e = e.firstChild.data;
-      let div = document.createElement("p");
-      div.innerHTML = decodeURIComponent(e);
-      e = div.innerText;
-      div.remove();
+      e = new DOMParser().parseFromString(e, "text/html").body.textContent
     } else {
       e = e.textContent;
-      let div = document.createElement("p");
-      div.innerHTML = decodeURIComponent(e);
-      e = div.innerText;
-      div.remove();
+      e = new DOMParser().parseFromString(e, "text/html").body.textContent
     }
     return e;
   },
   description: e => {
     e = e.textContent;
-    let div = document.createElement("p");
-    div.innerHTML = decodeURIComponent(e);
-    e = div.innerText;
-    div.remove();
+    e = new DOMParser().parseFromString(e, "text/html").body.textContent
     return e;
   },
   pubDate: e => dateParser(e.textContent),
