@@ -49,7 +49,7 @@ let Rss = class {
     this.feed = [];
   }
   async loadFeed() {
-    let feed = await fetch(CORS_PROXY+this.url,{"no-cache":true});
+    let feed = await fetch(CORS_PROXY+this.url,{headers:{"spekti-no-cache":true}});
     feed = await feed.text();
     feed = new DOMParser().parseFromString(feed, "text/xml");
     this.parseFeed(feed);

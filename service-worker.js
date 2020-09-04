@@ -37,16 +37,50 @@ self.addEventListener("fetch", (e) => {
   e.respondWith(
     caches.match(e.request).then((r) => {
       console.log("[SPEKTI SW] Fetching...: "+e.request.url);
-      return r || fetch(e.request).then((response) => {
-        return caches.open(cacheName).then((cache) => {
-          if ((e.request.url.indexOf("api.github.com") < 0)
-          && (e.request["no-cache"] !== true)) {
+      if ((r)
+      && (e.request.url.indexOf("api.github.com") < 0)
+      && (!e.request.headers.has("spekti-no-cache"))) {
+        console.log("[SPEKTI SW] Serving cached resource...: "+e.request.url);
+        return r;
+      } else {
+        return fetch(e.request).then((response) => {
+          return caches.open(cacheName).then((cache) => {
             console.log("[SPEKTI SW] Caching newly fetched resource: "+e.request.url);
             cache.put(e.request, response.clone());
-          }
-          return response;
+            return response;
+          });
+        }).catch(() => {
+          return caches.match(e.request).then((r) => {
+            if (r) {
+              console.log("[SPEKTI SW] Serving offline cached resource: "+e.request.url);
+              return r;
+            }
+          })
         });
-      });
+      }
     })
   );
 });
+/*
+    caches.match(e.request).then((r) => {
+      console.log("[SPEKTI SW] Fetching...: "+e.request.url);
+      if (r) {
+        console.log(r);
+        console.log("[SPEKTI SW] Serving cached resource...: "+e.request.url);
+        return r
+      } else {
+        fetch(e.request).then((response) => {
+        return caches.open(cacheName).then((cache) => {
+            if ((e.request.url.indexOf("api.github.com") < 0)
+            && (!e.request.headers.has("spekti-no-cache"))) {
+              console.log("[SPEKTI SW] Caching newly fetched resource: "+e.request.url);
+              cache.put(e.request, response.clone());
+            } else {
+              console.log("[SPEKTI SW] Resource not cached: "+e.request.url);
+            }
+            return response;
+          });
+        });
+      }
+    })
+*/
