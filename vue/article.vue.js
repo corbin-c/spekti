@@ -81,7 +81,6 @@ let articleView = {
   },
   async mounted() {
     if (this.fullContent) {
-      console.log("FULL CONTENT for",content.link);
       let readerContent = (await Reader(this.content.link));
       if (this.content.title == "") {
         this.content.title = readerContent.title;
