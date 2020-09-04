@@ -27,7 +27,7 @@
   ],
   "name": "Spekti",
   "short_name": "Spekti",
-  "start_url": "/spekti/vue/index.html",
+  "start_url": "/spekti/index.html",
   "scope": "/spekti/vue",
   "theme_color": "#17a2b8"
 }

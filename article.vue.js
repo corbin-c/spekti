@@ -1,5 +1,5 @@
 import { Reader } from "/spekti/reader.js";
-import { tagBar } from "/spekti/vue/tagbar.vue.js";
+import { tagBar } from "/spekti/tagbar.vue.js";
 
 let articleView = {
   data: function() {

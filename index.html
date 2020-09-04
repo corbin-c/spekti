@@ -6,7 +6,7 @@
     <meta name="theme-color" content="#b0c1d4"/>
     <meta charset="utf-8">
     <title>SPEKTI</title>
-    <link rel="manifest" href="/spekti/vue/manifest.json">
+    <link rel="manifest" href="/spekti/manifest.json">
     <link rel="icon" type="image/svg+xml" href="/spekti/logo/logo.svg">
     <link rel="icon" sizes="512x512" type="image/png" href="/spekti/logo/512.png">
     <link rel="icon" sizes="192x192" type="image/png" href="/spekti/logo/192.png">
@@ -14,7 +14,7 @@
     <link rel="apple-touch-icon" href="/spekti/logo/512.png">
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.0/css/bootstrap.min.css">
     <script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
-    <link rel="stylesheet" href="/spekti/vue/spekti.css">
+    <link rel="stylesheet" href="/spekti/spekti.css">
   </head>
   <body>
     <div class="spinner-grow text-info" role="status"><span class="sr-only">Loading...</span></div>
@@ -46,10 +46,10 @@
       </footer>
     </div>
   </body>
-<script src="/spekti/vue/hello.all.min.js"></script>
+<script src="/spekti/hello.all.min.js"></script>
 <script type="module">
-import { home } from "/spekti/vue/home.vue.js";
-import { modal } from "/spekti/vue/modal.vue.js";
+import { home } from "/spekti/home.vue.js";
+import { modal } from "/spekti/modal.vue.js";
 if('serviceWorker' in navigator) {
   navigator.serviceWorker.register("/spekti/service-worker.js");
 };

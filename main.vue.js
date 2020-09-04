@@ -2,7 +2,7 @@ import { DataGists } from "https://corbin-c.github.io/datagists/DataGists.js";
 import { Spekti } from "/spekti/spekti.js";
 import { Rss } from "/spekti/rss.js";
 
-import { articleView } from "/spekti/vue/article.vue.js";
+import { articleView } from "/spekti/article.vue.js";
 
 const maxItemsOnPage = 8;
       

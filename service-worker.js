@@ -3,21 +3,21 @@ let contentToCache = [
 "/spekti/spekti.js",
 "/spekti/rss.js",
 "/spekti/reader.js",
-"/spekti/vue/article.vue.js",
-"/spekti/vue/hello.all.min.js",
-"/spekti/vue/home.vue.js",
-"/spekti/vue/index.html",
-"/spekti/vue/main.vue.js",
-"/spekti/vue/manifest.json",
-"/spekti/vue/modal.vue.js",
-"/spekti/vue/notesabout.vue.js",
-"/spekti/vue/notes.vue.js",
-"/spekti/vue/sources.vue.js",
-"/spekti/vue/spekti.css",
-"/spekti/vue/tagbar.vue.js",
-"/spekti/vue/tagsabout.vue.js",
-"/spekti/vue/tags.vue.js",
-"/spekti/vue/tag.vue.js",
+"/spekti/article.vue.js",
+"/spekti/hello.all.min.js",
+"/spekti/home.vue.js",
+"/spekti/index.html",
+"/spekti/main.vue.js",
+"/spekti/manifest.json",
+"/spekti/modal.vue.js",
+"/spekti/notesabout.vue.js",
+"/spekti/notes.vue.js",
+"/spekti/sources.vue.js",
+"/spekti/spekti.css",
+"/spekti/tagbar.vue.js",
+"/spekti/tagsabout.vue.js",
+"/spekti/tags.vue.js",
+"/spekti/tag.vue.js",
 "/spekti/logo/192.png",
 "/spekti/logo/512.png",
 "/spekti/logo/favicon.ico",
@@ -61,26 +61,3 @@ self.addEventListener("fetch", (e) => {
     })
   );
 });
-/*
-    caches.match(e.request).then((r) => {
-      console.log("[SPEKTI SW] Fetching...: "+e.request.url);
-      if (r) {
-        console.log(r);
-        console.log("[SPEKTI SW] Serving cached resource...: "+e.request.url);
-        return r
-      } else {
-        fetch(e.request).then((response) => {
-        return caches.open(cacheName).then((cache) => {
-            if ((e.request.url.indexOf("api.github.com") < 0)
-            && (!e.request.headers.has("spekti-no-cache"))) {
-              console.log("[SPEKTI SW] Caching newly fetched resource: "+e.request.url);
-              cache.put(e.request, response.clone());
-            } else {
-              console.log("[SPEKTI SW] Resource not cached: "+e.request.url);
-            }
-            return response;
-          });
-        });
-      }
-    })
-*/

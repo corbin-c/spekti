@@ -1,4 +1,4 @@
-import { articleView } from "/spekti/vue/article.vue.js";
+import { articleView } from "/spekti/article.vue.js";
 
 let notesView = {
   data: function() {
