@@ -39,7 +39,8 @@ self.addEventListener("fetch", (e) => {
       console.log("[SPEKTI SW] Fetching...: "+e.request.url);
       return r || fetch(e.request).then((response) => {
         return caches.open(cacheName).then((cache) => {
-          if (e.request.url.indexOf("api.github.com") < 0) {
+          if ((e.request.url.indexOf("api.github.com") < 0)
+          && (e.request["no-cache"] !== true)) {
             console.log("[SPEKTI SW] Caching newly fetched resource: "+e.request.url);
             cache.put(e.request, response.clone());
           }
