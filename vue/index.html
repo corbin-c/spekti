@@ -2,8 +2,16 @@
 <html>
   <head>
     <meta http-equiv="content-type" content="text/html; charset=UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="theme-color" content="#b0c1d4"/>
     <meta charset="utf-8">
     <title>SPEKTI</title>
+    <link rel="manifest" href="/spekti/vue/manifest.json">
+    <link rel="icon" type="image/svg+xml" href="/spekti/logo/logo.svg">
+    <link rel="icon" sizes="512x512" type="image/png" href="/spekti/logo/512.png">
+    <link rel="icon" sizes="192x192" type="image/png" href="/spekti/logo/192.png">
+    <link rel="icon" sizes="32x32" href="/spekti/logo/favicon.ico">
+    <link rel="apple-touch-icon" href="/spekti/logo/512.png">
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.0/css/bootstrap.min.css">
     <script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
     <link rel="stylesheet" href="/spekti/vue/spekti.css">
@@ -21,12 +29,16 @@
             <a class="nav-link" title="Manage tags" href="#" v-on:click="setModal('tags')">Tags</a>
           </li>
           <li class="nav-item">
-            <a class="nav-link" title="Manage notes" href="#" v-on:click="setModal('notes')">Notes</a>
+            <a class="nav-link" title="Manage notes" href="#" v-on:click="showNotes">Notes</a>
           </li>
         </ul>
       </nav>
-      <app-home v-bind:update="lastUpdate" v-bind:tag="tag"></app-home>
-      <app-modal v-bind:content="modal" v-bind:update="lastUpdate"></app-modal>
+      <app-home v-bind:update="lastUpdate" v-bind:tag="tag" v-bind:notes="notes"></app-home>
+      <app-modal
+        v-bind:content="modal"
+        v-bind:update="lastUpdate"
+        v-bind:details="modalDetails">
+      </app-modal>
       <footer class="fixed-bottom text-right border-top border-info p-1 bg-light">
         <small class="p-2">
           <a href="https://github.com/corbin-c/spekti" title="Spekti repository by corbin-c on Github">Contribute on Github</a>
@@ -38,6 +50,9 @@
 <script type="module">
 import { home } from "/spekti/vue/home.vue.js";
 import { modal } from "/spekti/vue/modal.vue.js";
+if('serviceWorker' in navigator) {
+  navigator.serviceWorker.register("/spekti/service-worker.js");
+};
 hello.init({github:"e039324ddce920ed3111"});
 let app = new Vue({
   el: '#app',
@@ -46,8 +61,10 @@ let app = new Vue({
     currentRoute: window.location.pathname.slice(11),
     logged: false,
     modal: false,
+    modalDetails: false,
     spekti: false,
     tag: false,
+    notes: false,
     lastUpdate: (new Date()).valueOf()
   },
   mounted() {
@@ -58,6 +75,7 @@ let app = new Vue({
   created() {
     this.$on("hideModal",this.hideModal);
     this.$on("showModal",this.setModal);
+    this.$on("modalDetails",this.setModalDetails);
     this.$on("update",this.updateView);
     this.$on("showTag",this.showTag);
   },
@@ -69,14 +87,27 @@ let app = new Vue({
     setModal(target) {
       this.modal = target;
     },
+    setModalDetails(target) {
+      this.modalDetails = target;
+    },
     showTag(target) {
+      this.notes = false;
       this.tag = target;
+    },
+    showNotes() {
+      this.hideArticle();
+      this.tag = false;
+      this.notes = true;
+    },
+    hideNotes() {
+      this.notes = false;
     },
     updateView() {
       this.lastUpdate = (new Date()).valueOf();
     },
     hideModal() {
       this.setModal(false);
+      this.setModalDetails(false);
     },
     hideArticle() {
       this.$emit("closeFullArticle","");
@@ -87,6 +118,7 @@ let app = new Vue({
     hideAll() {
       this.hideArticle();
       this.hideTags();
+      this.hideNotes();
     }
   }
 });

@@ -4,8 +4,6 @@ let tagBar = {
       allTags: [],
     }
   },
-  computed: {
-  },
   methods: {
     hasTag(tag) {
       return this.allTags.includes(tag)
@@ -15,6 +13,14 @@ let tagBar = {
       if (typeof tags !== "undefined") {
         this.allTags = tags.tags;        
       }
+    },
+    showTags() {
+      this.$root.$emit("showModal","tags-about");
+      this.$root.$emit("modalDetails",{url: this.url, title: this.title});
+    },
+    showNotes() {
+      this.$root.$emit("showModal","notes-about");
+      this.$root.$emit("modalDetails",this.url);
     },
     async addTag(tag) {
       await this.$root.spekti.tags.tagArticle(this.url,this.title,tag);
@@ -54,9 +60,14 @@ let tagBar = {
         <use xlink:href="/octicons-sprite/octicons-sprite.svg#eye-24"></use>
       </svg>
     </button>
-    <button class="btn btn-outline-secondary" title="add a custom tag to this article">
+    <button class="btn btn-outline-secondary" title="add a custom tag to this article" v-on:click="showTags">
       <svg class="d-inline">
         <use xlink:href="/octicons-sprite/octicons-sprite.svg#plus-24"></use>
+      </svg>
+    </button>
+    <button class="btn btn-outline-secondary" title="add a note to this article" v-on:click="showNotes">
+      <svg class="d-inline">
+        <use xlink:href="/octicons-sprite/octicons-sprite.svg#pencil-24"></use>
       </svg>
     </button>
   </div>

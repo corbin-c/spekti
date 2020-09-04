@@ -1,5 +1,6 @@
 import { mainView } from "/spekti/vue/main.vue.js";
 import { tagView } from "/spekti/vue/tag.vue.js";
+import { notesView } from "/spekti/vue/notes.vue.js";
 let home = {
   methods: {
     helloLogin() {
@@ -8,9 +9,10 @@ let home = {
   },
   components: {
     "main-view": mainView,
-    "tag-view": tagView
+    "tag-view": tagView,
+    "notes-view": notesView
   },
-  props: ["update","tag"],
+  props: ["update","tag","notes"],
   template: `
   <main>
     <div class="text-center p-5 m-3" v-if="this.$root.logged === false">
@@ -23,7 +25,7 @@ let home = {
       </div>
       <template v-else>
         <tag-view v-if="tag !== false" v-bind:tag="tag" v-bind:update="update"></tag-view>
-        <!--<notes-view v-if="notes !== false"></notes-view>-->
+        <notes-view v-else-if="notes !== false" v-bind:update="update"></notes-view>
         <main-view v-else v-bind:update="update"></main-view>      
       </template>
   </main>`

@@ -16,10 +16,11 @@ let articleView = {
       if ((this.date == "") && (this.content.author == "")) {
         return "";
       } else if (this.content.author == "") {
-        return "Published on "+this.date;
-      } else {
-        return "Published by "+this.content.author+" – "+this.date;
+        return this.date;
+      } else if (this.content.date == "") {
+        return this.content.author+" – ";
       }
+      return this.content.author+" – "+this.date;
     },
     date() {
       try {
@@ -80,7 +81,16 @@ let articleView = {
   },
   async mounted() {
     if (this.fullContent) {
-      this.readerContent = (await Reader(this.content.link)).content;
+      let readerContent = (await Reader(this.content.link));
+      if (this.content.title == "") {
+        this.content.title = readerContent.title;
+      }
+      if (this.content.author == "") {
+        this.content.author = (readerContent.byline == "")
+          ? readerContent.siteName
+          : readerContent.byline;
+      }
+      this.readerContent = readerContent.content;
     }
   },
   props: ["content","fullContent"],

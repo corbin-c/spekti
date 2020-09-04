@@ -4,9 +4,12 @@ import { Rss } from "/spekti/rss.js";
 
 import { articleView } from "/spekti/vue/article.vue.js";
 
+const maxItemsOnPage = 8;
+      
 let mainView = {
   data: function() {
     return {
+      maxItems: maxItemsOnPage,
       ready: false,
       noSources: false,
       singleArticle: false,
@@ -22,7 +25,7 @@ let mainView = {
         .map(article => article.url);
       return this.allArticles
         .filter(article =>  !reviewed.includes(article.link))
-        .sort((a,b) => b.date - a.date);
+        .sort((a,b) => b.date - a.date).slice(0,this.maxItems);
     },
     classes() {
       return {
@@ -50,6 +53,21 @@ let mainView = {
     "article-view": articleView
   },
   methods: {
+    scroll () {
+      window.onscroll = () => {
+        if ((this.singleArticle === false) && (this.ready)) {
+          let bottomOfWindow = Math.max(
+            window.pageYOffset,
+            document.documentElement.scrollTop,
+            document.body.scrollTop)
+            + window.innerHeight;
+          if (bottomOfWindow 
+            >= document.documentElement.offsetHeight-window.innerHeight*0.075) {
+           this.maxItems += maxItemsOnPage;
+          }
+        }
+      }
+    },
     hideArticle() {
       this.singleArticle = false;
     },
@@ -98,6 +116,7 @@ let mainView = {
       ];
       this.$root.spekti = new Spekti(gist,entities);
       this.loadContent();
+      this.scroll();
     });
   },
   props: ["update"],

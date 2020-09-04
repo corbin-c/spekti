@@ -4,10 +4,6 @@ let tags = {
       tags: [],
     }
   },
-  watch: {
-    update: function () {
-    }
-  },
   computed: {
     allTags() {
       return this.tags;
@@ -26,7 +22,6 @@ let tags = {
   mounted: function() {
     this.getTags();
   },
-  props: ["update"],
   template: `
   <div class="modal-body d-flex justify-content-around flex-wrap align-content-around">
     <p v-if="allTags.length == 0">There is no tag yet. Start reviewing or tagging articles to see something here.</p>

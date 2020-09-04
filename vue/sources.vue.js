@@ -56,7 +56,7 @@ let sources = {
   props: ["update"],
   template: `
   <div>
-    <ul class="modal-body list-group list-group-flush">
+    <ul class="modal-body sources list-group list-group-flush">
       <li v-for="source in allSources" class="list-group-item  d-flex justify-content-between align-items-center">{{ source }}
         <span class="badge badge-pill" v-on:click="removeSource(source)">
           <svg class="d-inline">

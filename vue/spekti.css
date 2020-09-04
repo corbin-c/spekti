@@ -1,3 +1,12 @@
+nav {
+  background-image: url("/spekti/logo/logo.svg");
+  background-repeat: no-repeat;
+  background-position-x: -6px;
+  background-position-y: 1px;
+}
+nav h2 {
+  margin-left: 2rem;
+}
 .spinner-grow {
   display: block;
   position: absolute;
@@ -5,6 +14,9 @@
   left: calc(50vw - 5rem);
   width: 10rem;
   height: 10rem;
+}
+.sticky-top {
+  top: -2px;
 }
 .inline li {
   display: inline;
@@ -15,20 +27,57 @@
   height: 24px;
   fill: white;
 }
-.modal .badge svg {
+.sources .badge {
+  border: 1px solid var(--danger);
+}
+.sources .badge:hover {
+  background: var(--danger);
+  cursor: pointer;
+}
+.sources .badge svg {
   width: 16px;
   height: 16px;
   fill: var(--danger);
 }
-.modal .badge {
-  border: 1px solid var(--danger);
+.sources .badge:hover svg {
+  fill: var(--white);
 }
-.modal .badge:hover {
-  background: var(--danger);
+.list-group .badge svg {
+  width: 16px;
+  height: 16px;
+}
+.list-group .badge:hover {
   cursor: pointer;
 }
-.modal .badge:hover svg {
+.list-group .badge:hover svg {
   fill: var(--white);
+}
+.badge-source svg {
+  fill: var(--primary);
+}
+.badge-delete svg {
+  fill: var(--danger);
+}
+.badge-edit svg {
+  fill: var(--warning);
+}
+.badge-source {
+  border: 1px solid var(--primary);
+}
+.badge-delete {
+  border: 1px solid var(--danger);
+}
+.badge-edit {
+  border: 1px solid var(--warning);
+}
+.badge-source:hover {
+  background: var(--primary);
+}
+.badge-delete:hover {
+  background: var(--danger);
+}
+.badge-edit:hover {
+  background: var(--warning);
 }
 .btn-outline-info svg {
   fill: var(--info);
@@ -57,15 +106,15 @@ a:hover {
 .modal-backdrop {
   opacity: 0.5;
 }
-.modal-title {
+.modal-title::first-letter {
   text-transform: capitalize;
 }
-.modal-footer input {
+.modal-footer input, .card-footer textarea {
   width: 80%;
 }
 @media (min-width: 576px) {
   .card-columns {
-    column-count: 1;
+    column-count: 2;
   }
 }
 @media (min-width: 768px) {
@@ -106,7 +155,7 @@ a:hover {
   height: max-content;
 }
 .tagbar {
-  top: calc(4rem - 1px);
+  top: calc(4rem - 3px);
   background: #f7f7f7;
 }
 button .hover {
@@ -120,4 +169,7 @@ button .regular {
 }
 button:hover .regular {
   display: none;
+}
+.hidden {
+  visibility: hidden;
 }
