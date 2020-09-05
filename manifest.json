@@ -20,9 +20,9 @@
     },
     {
       "src": "/spekti/logo/maskable.png",
-      "sizes": "192x192 512x512 731x731",
+      "sizes": "196x196",
       "type": "image/png",
-      "purpose": "any maskable"
+      "purpose": "maskable"
     }
   ],
   "name": "Spekti",
