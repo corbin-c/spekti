@@ -56,6 +56,9 @@ let Tags = class extends SpektiEntity {
       console.warn("article "+url+" not found, tag deletion aborted");
     } else {
       article.tags = article.tags.filter(e => !tag.some(f => f==e));
+      if (article.tags.length == 0) {
+        this.content = this.content.filter(e => e.url != url);
+      }
       await this.commitChanges();
     }
   }
