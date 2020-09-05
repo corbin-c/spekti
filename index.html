@@ -69,7 +69,7 @@ let app = new Vue({
   },
   mounted() {
     (async () => {
-      let online = await fetch("/spekti/online/");
+      let online = await fetch("/spekti/online");
       online = await online.text();
       if (online == "false") {
         app.logged = true;
