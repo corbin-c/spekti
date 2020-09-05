@@ -68,6 +68,13 @@ let app = new Vue({
     lastUpdate: (new Date()).valueOf()
   },
   mounted() {
+    (async () => {
+      let online = await fetch("/spekti/online/");
+      online = await online.text();
+      if (online == "false") {
+        app.logged = true;
+      }
+    })();
     hello.on("auth.login", function(auth) {
       app.logged = auth.authResponse.access_token;
     });
