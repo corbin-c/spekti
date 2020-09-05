@@ -86,7 +86,7 @@ let mainView = {
       } else {
         this.noSources = false;
         let feed = [];
-        await Promise.any(rss.map(async (source) => {
+        rss.map(async (source) => {
           source = new Rss(source);
           await source.loadFeed();
           feed = [...feed,...source.feed];
@@ -94,12 +94,14 @@ let mainView = {
             if (!this.allArticles.includes(feedItem)) {
               this.allArticles.push(feedItem);
             }
+            if (!this.ready) {
+              this.ready = true;
+            }
           });
           this.allArticles = this.allArticles
             .filter(article => (feed.includes(article)))
-        }));
+        });
       }
-      this.ready = true;
     },
     showSources() {
       this.$root.$emit("showModal","sources");
