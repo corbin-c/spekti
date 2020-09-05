@@ -34,9 +34,11 @@ let tagsAbout = {
       }
     },
     async thisTags() {
-      let tags = await this.$root.spekti.tags.tagsAbout(this.details);
+      let tags = await this.$root.spekti.tags.tagsAbout(this.details.url);
       if (typeof tags !== "undefined") {
         this.tagsAbout = tags.tags;
+      } else {
+        this.tagsAbout = [];
       }
     },
     async getTags() {
@@ -47,7 +49,7 @@ let tagsAbout = {
         tag = this.newTag;
         this.newTag = "";
       }
-      await this.$root.spekti.tags.tagArticle(this.details,"",tag);
+      await this.$root.spekti.tags.tagArticle(this.details.url,this.details.title,tag);
       this.getTags();
       this.thisTags();
     },
