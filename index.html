@@ -52,6 +52,42 @@ import { home } from "/spekti/home.vue.js";
 import { modal } from "/spekti/modal.vue.js";
 if('serviceWorker' in navigator) {
   navigator.serviceWorker.register("/spekti/service-worker.js");
+  navigator.serviceWorker.onmessage = (e) => {
+      let message = JSON.parse(e.data)
+      let keys = localStorage.getItem("spekti-keys") || "[]";
+      keys = JSON.parse(keys);
+      if (message.method == "GET") {
+        message.body = {};
+        keys.map(e => {
+          message.body[e] = localStorage.getItem(e);
+        });
+      } else if (message.method == "SYNC") {
+        message.body = {};
+        message.body.token = app.logged;
+        message.body.gistId = app.spekti.gist.id;
+      } else if (message.method == "CLEAR") {
+        keys.map(e => {
+          localStorage.removeItem(e);
+        });
+        localStorage.removeItem("spekti-keys");
+      } else {
+        if ((!message.init)
+        || (localStorage.getItem(message.key) === null)) {
+          if (!keys.includes(message.key)) {
+            keys.push(message.key);
+            localStorage.setItem("spekti-keys", JSON.stringify(keys));
+          }
+          localStorage.setItem(message.key, message.body);
+        }
+      }
+      navigator.serviceWorker.controller.postMessage(JSON.stringify(message));
+  };
+  navigator.serviceWorker.ready.then(swRegistration => {
+    return swRegistration.sync.register('gistSync');
+  });
+  document.body.addEventListener("online", () => {
+    navigator.serviceWorker.controller.postMessage("FORCE SYNC");
+  }, false);
 };
 hello.init({github:"e039324ddce920ed3111"});
 let app = new Vue({

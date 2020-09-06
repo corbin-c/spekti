@@ -20,7 +20,6 @@ let tagBar = {
       } else {
         this.allTags = [];
       }
-      console.log(tags);
     },
     showTags() {
       this.$root.$emit("showModal","tags-about");

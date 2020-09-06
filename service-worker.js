@@ -30,46 +30,150 @@ let contentToCache = [
 "https://maxcdn.bootstrapcdn.com/bootstrap/4.5.0/css/bootstrap.min.css",
 "https://cdn.jsdelivr.net/npm/vue/dist/vue.js"
 ];
+
+let messages = [];
+self.addEventListener("message", (e) => {
+  if (e.data == "FORCE SYNC") {
+    syncGistStorage(true);
+  } else {
+    let data = JSON.parse(e.data)
+    messages.find(e => e.id == data.id).responseReceived(data);
+  }
+});
+
+let Message = class {
+  constructor(content) {
+    this.content = content;
+    this.id = (messages.sort((a,b) => b.id - a.id)[0] || {id:0}).id+1;
+    this.content.id = this.id;
+    this.responseReceived = {};
+    this.response = new Promise((resolve,reject) => {
+      this.responseReceived = resolve;
+    });
+    messages.push(this);
+  }
+  async send() {
+    self.clients.matchAll().then((clients) => {
+      if (clients && clients.length) {
+        clients.map(client => {
+          client.postMessage(JSON.stringify(this.content));
+        })
+      }
+    });
+    let response = await this.response;
+    messages = messages.filter(e => e.id !== this.id);
+    return response;
+  }
+}
+
+let localStorage = async (method,key=false,body=false,init=false) => {
+  let message = new Message({method,key,body,init});
+  message = await message.send();
+  return message.body;
+}
+
 let fetchHandler = (request) => {
-    if (request.url.indexOf("/spekti/online") < 0) {
-      return caches.match(request).then((r) => {
-        console.log("[SPEKTI SW] Fetching...: "+request.url);
-        if ((r)
-        && (request.url.indexOf("api.github.com") < 0)
-        && (!request.headers.has("spekti-no-cache"))) {
-          console.log("[SPEKTI SW] Serving cached resource...: "+request.url);
-          return r;
-        } else {
-          return fetch(request).then((response) => {
-            return caches.open(cacheName).then((cache) => {
-              console.log("[SPEKTI SW] Caching newly fetched resource: "+request.url);
+  if ((request.method == "PATCH") //intercept PATCH requests to save body before sending them
+  && (request.url.indexOf("api.github.com/gists/") > 0)) {
+    request.clone().text().then(json => {
+      json = JSON.parse(json);
+      Object.keys(json.files).map(key => {
+        localStorage("SET",key,json.files[key].content);
+      });
+    });
+  }
+  if (request.url.indexOf("/spekti/online") < 0) { //all requests except special "online" request, used to test connectivty
+    return caches.match(request).then((r) => {
+      //~ console.log("[SPEKTI SW] Fetching...: "+request.url);
+      if ((r)
+      && (request.url.indexOf("api.github.com") < 0)
+      && (!request.headers.has("spekti-no-cache"))) { //serve cached resources except RSS feeds & github api responses
+        //~ console.log("[SPEKTI SW] Serving cached resource...: "+request.url);
+        return r;
+      } else { //when resource not in cache
+        return fetch(request).then((response) => {
+          return caches.open(cacheName).then((cache) => {
+            //~ console.log("[SPEKTI SW] Caching newly fetched resource: "+request.url);
+            if ((request.url.indexOf("api.github.com/gists/") > 0)
+            && (request.method == "GET")) {
+              response.clone().json().then(json => {
+                Object.keys(json.files).map(key => {
+                  localStorage("SET",key,json.files[key].content,true);
+                })
+              });
+            }
+            if (request.method != "PATCH") {
               cache.put(request, response.clone());
-              return response;
-            });
-          }).catch(() => {
-            return caches.match(request).then((r) => {
-              if (r) {
-                console.log("[SPEKTI SW] Serving offline cached resource: "+request.url);
+            }
+            return response;
+          });
+        }).catch(() => {
+          return caches.match(request,{ignoreVary:true}).then((r) => { //when offline, always try to serve cached resource
+            if (r) {
+              if (request.url.indexOf("api.github.com/gists/") > 0) {
+                if (request.method == "GET") {
+                  return localStorage("GET").then(storage => {
+                    return r.json().then(json => {
+                      Object.keys(json.files).map(key => {
+                        json.files[key].content = storage[key];
+                      });
+                      return new Response(JSON.stringify(json),r);
+                    });
+                  });
+                }
+              } else {
                 return r;
               }
-            })
-          });
+            }
+          })
+        });
+      }
+    });
+  } else {
+    return fetch(request).then((response) => {
+      console.log("[SPEKTI SW] Working online !");
+      return response;
+    }).catch(() => {
+      return caches.match(request).then((r) => {
+        if (r) {
+          console.log("[SPEKTI SW] Working offline :/");
+          return new Response("false", r);
         }
-      });
-    } else {
-      return fetch(request).then((response) => {
-        console.log("[SPEKTI SW] Working online !");
-        return response;
-      }).catch(() => {
-        return caches.match(request).then((r) => {
-          if (r) {
-            console.log("[SPEKTI SW] Working offline :/");
-            return new Response("false", r);
-          }
-        })
       })
-    }
+    })
+  }
 };
+let syncGistStorage = (forced=false) => {
+  console.log("[SPEKTI SW] sync now !",forced);
+  return new Promise((resolve,reject) => {
+    localStorage("SYNC").then(gist => {
+      if ((typeof gist.token === "boolean")
+      || (typeof gist.id === "undefined")) {
+        reject();
+      } else {
+        localStorage("GET").then(storage => {
+          Object.keys(storage).map(key => {
+            storage[key] = { content:storage[key] }
+          });
+          let headers = {
+            "Accept": "application/vnd.github.v3+json",
+            "Content-Type": "application/json",
+            "Authorization": "token "+gist.token
+          };
+          fetch("https://api.github.com/gists/"+gist.id, {
+            headers: headers,
+            method: "PATCH",
+            body: JSON.stringify({files:storage})
+          }).then(response => {
+            resolve(response);
+            localStorage("CLEAR");
+          })
+        });
+      }
+    });
+  });
+};
+
 self.addEventListener("install", (e) => {
   console.log("[SPEKTI SW] Installation");
   e.waitUntil(
@@ -81,4 +185,9 @@ self.addEventListener("install", (e) => {
 });
 self.addEventListener("fetch", (e) => {
   e.respondWith(fetchHandler(e.request));
+});
+self.addEventListener("sync", (e) => {
+  if (e.tag == "gistSync") {
+    e.waitUntil(syncGistStorage());
+  }
 });
