@@ -85,9 +85,6 @@ if('serviceWorker' in navigator) {
   navigator.serviceWorker.ready.then(swRegistration => {
     return swRegistration.sync.register('gistSync');
   });
-  document.body.addEventListener("online", () => {
-    navigator.serviceWorker.controller.postMessage("FORCE SYNC");
-  }, false);
 };
 hello.init({github:"e039324ddce920ed3111"});
 let app = new Vue({

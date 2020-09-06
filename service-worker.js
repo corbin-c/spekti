@@ -100,6 +100,12 @@ let fetchHandler = (request) => {
                 Object.keys(json.files).map(key => {
                   localStorage("SET",key,json.files[key].content,true);
                 })
+                return localStorage("GET").then(storage => {
+                  Object.keys(json.files).map(key => {
+                    json.files[key].content = storage[key];
+                  });
+                  return new Response(JSON.stringify(json),response);
+                });
               });
             }
             if (request.method != "PATCH") {
@@ -148,8 +154,8 @@ let syncGistStorage = (forced=false) => {
   return new Promise((resolve,reject) => {
     localStorage("SYNC").then(gist => {
       if ((typeof gist.token === "boolean")
-      || (typeof gist.id === "undefined")) {
-        reject();
+      || (typeof gist.gistId === "undefined")) {
+        reject(true);
       } else {
         localStorage("GET").then(storage => {
           Object.keys(storage).map(key => {

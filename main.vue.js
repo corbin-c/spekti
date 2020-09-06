@@ -119,6 +119,10 @@ let mainView = {
       this.$root.spekti = new Spekti(gist,entities);
       this.loadContent();
       this.scroll();
+      try {
+        await this.$root.spekti.ready;
+        navigator.serviceWorker.controller.postMessage("FORCE SYNC");
+      } catch {}
     });
   },
   props: ["update"],
