@@ -92,27 +92,31 @@ let fetchHandler = (request) => {
         return r;
       } else { //when resource not in cache
         return fetch(request).then((response) => {
-          return caches.open(cacheName).then((cache) => {
-            //~ console.log("[SPEKTI SW] Caching newly fetched resource: "+request.url);
-            if ((request.url.indexOf("api.github.com/gists/") > 0)
-            && (request.method == "GET")) {
-              response.clone().json().then(json => {
-                Object.keys(json.files).map(key => {
-                  localStorage("SET",key,json.files[key].content,true);
-                })
-                return localStorage("GET").then(storage => {
+          if ((response.status >= 200) && (response.status < 300)) {
+            return caches.open(cacheName).then((cache) => {
+              //~ console.log("[SPEKTI SW] Caching newly fetched resource: "+request.url);
+              if ((request.url.indexOf("api.github.com/gists/") > 0)
+              && (request.method == "GET")) {
+                response.clone().json().then(json => {
                   Object.keys(json.files).map(key => {
-                    json.files[key].content = storage[key];
+                    localStorage("SET",key,json.files[key].content,true);
+                  })
+                  return localStorage("GET").then(storage => {
+                    Object.keys(json.files).map(key => {
+                      json.files[key].content = storage[key];
+                    });
+                    return new Response(JSON.stringify(json),response);
                   });
-                  return new Response(JSON.stringify(json),response);
                 });
-              });
-            }
-            if (request.method != "PATCH") {
-              cache.put(request, response.clone());
-            }
+              }
+              if (request.method != "PATCH") {
+                cache.put(request, response.clone());
+              }
+              return response;
+            });
+          } else {
             return response;
-          });
+          }
         }).catch(() => {
           return caches.match(request,{ignoreVary:true}).then((r) => { //when offline, always try to serve cached resource
             if (r) {
