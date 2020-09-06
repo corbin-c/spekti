@@ -161,19 +161,23 @@ let syncGistStorage = (forced=false) => {
           Object.keys(storage).map(key => {
             storage[key] = { content:storage[key] }
           });
-          let headers = {
-            "Accept": "application/vnd.github.v3+json",
-            "Content-Type": "application/json",
-            "Authorization": "token "+gist.token
-          };
-          fetch("https://api.github.com/gists/"+gist.gistId, {
-            headers: headers,
-            method: "PATCH",
-            body: JSON.stringify({files:storage})
-          }).then(response => {
-            resolve(response);
-            localStorage("CLEAR");
-          })
+          if (Object.keys(storage).length > 0) {
+            let headers = {
+              "Accept": "application/vnd.github.v3+json",
+              "Content-Type": "application/json",
+              "Authorization": "token "+gist.token
+            };
+            fetch("https://api.github.com/gists/"+gist.gistId, {
+              headers: headers,
+              method: "PATCH",
+              body: JSON.stringify({files:storage})
+            }).then(response => {
+              resolve(response);
+              localStorage("CLEAR");
+            });
+          } else {
+            reject(true);
+          }
         });
       }
     });
