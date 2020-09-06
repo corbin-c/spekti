@@ -166,7 +166,7 @@ let syncGistStorage = (forced=false) => {
             "Content-Type": "application/json",
             "Authorization": "token "+gist.token
           };
-          fetch("https://api.github.com/gists/"+gist.id, {
+          fetch("https://api.github.com/gists/"+gist.gistId, {
             headers: headers,
             method: "PATCH",
             body: JSON.stringify({files:storage})
