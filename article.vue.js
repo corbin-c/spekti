@@ -43,6 +43,7 @@ let articleView = {
         "card-header": this.fullContent,
         "row":  this.fullContent,
         "no-gutters": this.fullContent,
+        "align-items-center": this.fullContent
       }
     },
     titleClasses() {
