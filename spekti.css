@@ -151,10 +151,11 @@ a:hover {
 .card-body img, .card-body iframe {
   display: block;
   margin: auto;
+  height: auto;
   max-width: 100%;
 }
 .tagbar {
-  top: calc(4rem - 3px);
+  top: calc(4rem - 2.5px);
   background: #f7f7f7;
 }
 button .hover {
