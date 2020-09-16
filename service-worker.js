@@ -1,4 +1,4 @@
-let cacheName = "spekti-v1";
+let cacheName = "spekti-v2";
 let contentToCache = [
 "/spekti/",
 "/spekti/online",
@@ -33,11 +33,13 @@ let contentToCache = [
 
 let messages = [];
 
-let clearCache = () => {
+let clearCache = (force=false) => {
   console.log("[SPEKTI SW] Clearing cache...");
   caches.keys().then((keyList) => {
     return Promise.all(keyList.map((key) => {
+      if ((cacheName.indexOf(key) < 0) || (force)) {
         return caches.delete(key);
+      }
     }));
   });
 }
@@ -211,7 +213,7 @@ let checkCache = async () => {
   })();
   console.log("[SPEKTI SW] Cache Size is:",cacheSize);
   if (cacheSize > 100000000) {
-    clearCache();
+    clearCache(true);
   }
 }
 
