@@ -23,13 +23,13 @@
         <h2 class="text-info" v-on:click="hideAll">{{ appName }}</h2>
         <ul class="navbar-nav ml-auto" v-if="spekti !== false">
           <li class="nav-item">
-            <a class="nav-link" title="Manage sources" href="#" v-on:click="setModal('sources')">Sources</a>
+            <a class="nav-link" title="Manage sources" v-on:click="setModal('sources')">Sources</a>
           </li>
           <li class="nav-item">
-            <a class="nav-link" title="Manage tags" href="#" v-on:click="setModal('tags')">Tags</a>
+            <a class="nav-link" title="Manage tags" v-on:click="setModal('tags')">Tags</a>
           </li>
           <li class="nav-item">
-            <a class="nav-link" title="Manage notes" href="#" v-on:click="showNotes">Notes</a>
+            <a class="nav-link" title="Manage notes" v-on:click="showNotes">Notes</a>
           </li>
         </ul>
       </nav>
