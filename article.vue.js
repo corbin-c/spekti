@@ -82,6 +82,7 @@ let articleView = {
   },
   async mounted() {
     if (this.fullContent) {
+      window.scrollTo(0,0)
       let readerContent = (await Reader(this.content.link));
       if (this.content.title == "") {
         this.content.title = readerContent.title;
@@ -92,39 +93,43 @@ let articleView = {
           : readerContent.byline;
       }
       this.readerContent = readerContent.content;
+    } else {
+      window.scrollTo(0,this.scroll)
     }
   },
-  props: ["content","fullContent"],
+  props: ["content","fullContent","scroll"],
   template: `
-  <article class="card mb-3">
-    <div v-bind:class="headerClasses">
-      <img
-        v-if="content.img.length > 0"
-        v-bind:src="content.img"
-        v-bind:class="imgClasses"
-        v-on:click="toggleFullContent"
-        v-bind:alt="content.title">
-      <h3 
-        v-bind:class="titleClasses" v-on:click="toggleFullContent">
-        {{ content.title }}
-      </h3>
-    </div>
-    <tag-bar v-if="fullContent" v-bind:url="content.link" v-bind:title="content.title"></tag-bar>
-    <div class="card-body" v-if="fullContent">
-      <p v-html="readerContent" v-bind:class="contentClasses"></p>
-    </div>
-    <div class="card-body" v-else>
-      <p class="card-text">{{ abstract }}</p>
-    </div>
-    <button type="button" id="close" class="btn btn-info" data-dismiss="modal" aria-label="Close" v-if="fullContent" v-on:click="toggleFullContent">
-      <span aria-hidden="true">&times;</span>
-    </button>
-    <div class="card-footer">
-      <p class="card-text">
-        <small class="text-muted">
-         {{ footer }}<a v-bind:href="content.link" v-bind:title="'Open article « '+content.title+' »'" target="_blank">Source</a>
-        </small>
-      </p>
+  <article class="col">
+    <div class="card mb-3">
+      <div v-bind:class="headerClasses">
+        <img
+          v-if="content.img.length > 0"
+          v-bind:src="content.img"
+          v-bind:class="imgClasses"
+          v-on:click="toggleFullContent"
+          v-bind:alt="content.title">
+        <h3 
+          v-bind:class="titleClasses" v-on:click="toggleFullContent">
+          {{ content.title }}
+        </h3>
+      </div>
+      <tag-bar v-if="fullContent" v-bind:url="content.link" v-bind:title="content.title"></tag-bar>
+      <div class="card-body" v-if="fullContent">
+        <p v-html="readerContent" v-bind:class="contentClasses"></p>
+      </div>
+      <div class="card-body" v-else>
+        <p class="card-text">{{ abstract }}</p>
+      </div>
+      <button type="button" id="close" class="btn btn-info" data-dismiss="modal" aria-label="Close" v-if="fullContent" v-on:click="toggleFullContent">
+        <span aria-hidden="true">&times;</span>
+      </button>
+      <div class="card-footer">
+        <p class="card-text">
+          <small class="text-muted">
+           {{ footer }}<a v-bind:href="content.link" v-bind:title="'Open article « '+content.title+' »'" target="_blank">Source</a>
+          </small>
+        </p>
+      </div>
     </div>
   </article>`
 };

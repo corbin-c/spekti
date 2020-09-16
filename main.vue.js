@@ -4,7 +4,7 @@ import { Rss } from "/spekti/rss.js";
 
 import { articleView } from "/spekti/article.vue.js";
 
-const maxItemsOnPage = 8;
+const maxItemsOnPage = 12;
       
 let mainView = {
   data: function() {
@@ -13,6 +13,7 @@ let mainView = {
       ready: false,
       noSources: false,
       singleArticle: false,
+      scrollY: 0,
       allArticles: [],
       tags: []
     }
@@ -31,7 +32,11 @@ let mainView = {
       return {
         "spinner-grow": !this.ready,
         "text-info": !this.ready,
-        "card-columns": this.ready && !this.noSources && !this.singleArticle,
+        "row": this.ready && !this.noSources && !this.singleArticle,
+        "row-cols-1": this.ready && !this.noSources && !this.singleArticle,
+        "row-cols-sm-2": this.ready && !this.noSources && !this.singleArticle,
+        "row-cols-lg-3": this.ready && !this.noSources && !this.singleArticle,
+        "row-cols-xl-4": this.ready && !this.noSources && !this.singleArticle,
         "mt-3": this.ready && !this.noSources,
         "mb-5": this.ready && !this.noSources,
         "text-center": this.ready && this.noSources,
@@ -56,6 +61,7 @@ let mainView = {
     scroll () {
       window.onscroll = () => {
         if ((this.singleArticle === false) && (this.ready)) {
+          this.scrollY = document.documentElement.scrollTop;
           let bottomOfWindow = Math.max(
             window.pageYOffset,
             document.documentElement.scrollTop,
@@ -129,8 +135,8 @@ let mainView = {
   template: 
   `<section v-bind:class="classes">
       <article v-if="noSources" class="card"><p class="card-body">No source has been found. You can start <a href="#" v-on:click="showSources" title="add some content">adding some RSS feeds</a> now !</p></article>
-      <article-view v-if="singleArticle !== false" v-bind:content="singleArticle" v-bind:fullContent="(singleArticle !== false)"></article-view>
-      <article-view v-else v-for="article in articles" v-bind:content="article" v-bind:fullContent="(singleArticle !== false)"></article-view>
+      <article-view v-if="singleArticle !== false" v-bind:content="singleArticle" v-bind:scroll="scrollY" v-bind:fullContent="(singleArticle !== false)"></article-view>
+      <article-view v-else v-for="article in articles" v-bind:content="article" v-bind:scroll="scrollY" v-bind:fullContent="(singleArticle !== false)"></article-view>
   </section>`
 };
 export { mainView }
