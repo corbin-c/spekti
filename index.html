@@ -51,36 +51,38 @@
 import { home } from "/spekti/home.vue.js";
 import { modal } from "/spekti/modal.vue.js";
 if('serviceWorker' in navigator) {
-  navigator.serviceWorker.register("/spekti/service-worker.js");
+  navigator.serviceWorker.register("/spekti/service-worker.js")
+    .then(e => e.update());
+  localStorage.setItem("synced",true);
   navigator.serviceWorker.onmessage = (e) => {
-      let message = JSON.parse(e.data)
-      let keys = localStorage.getItem("spekti-keys") || "[]";
-      keys = JSON.parse(keys);
-      if (message.method == "GET") {
-        message.body = {};
-        keys.map(e => {
-          message.body[e] = localStorage.getItem(e);
-        });
-      } else if (message.method == "SYNC") {
-        message.body = {};
-        message.body.token = app.logged;
-        message.body.gistId = app.spekti.gist.id;
-      } else if (message.method == "CLEAR") {
-        keys.map(e => {
-          localStorage.removeItem(e);
-        });
-        localStorage.removeItem("spekti-keys");
-      } else {
-        if ((!message.init)
-        || (localStorage.getItem(message.key) === null)) {
-          if (!keys.includes(message.key)) {
-            keys.push(message.key);
-            localStorage.setItem("spekti-keys", JSON.stringify(keys));
-          }
-          localStorage.setItem(message.key, message.body);
+    let message = JSON.parse(e.data)
+    let keys = localStorage.getItem("spekti-keys") || "[]";
+    keys = JSON.parse(keys);
+    if (message.method == "GET") {
+      message.body = {};
+      keys.map(e => {
+        message.body[e] = localStorage.getItem(e);
+      });
+    } else if (message.method == "SYNC") {
+      message.body = {};
+      message.body.token = app.logged;
+      message.body.gistId = app.spekti.gist.id;
+    } else if (message.method == "CLEAR") {
+      localStorage.setItem("synced","true");
+    } else {
+      if ((!message.init)
+      || (localStorage.getItem("synced") === "true")) {
+        if (!keys.includes(message.key)) {
+          keys.push(message.key);
+          localStorage.setItem("spekti-keys", JSON.stringify(keys));
+        }
+        localStorage.setItem(message.key, message.body);
+        if (!message.init) {
+          localStorage.setItem("synced","false");
         }
       }
-      navigator.serviceWorker.controller.postMessage(JSON.stringify(message));
+    }
+    navigator.serviceWorker.controller.postMessage(JSON.stringify(message));
   };
   navigator.serviceWorker.ready.then(swRegistration => {
     return swRegistration.sync.register('gistSync');
@@ -164,5 +166,11 @@ let app = new Vue({
 });
 document.querySelector(".spinner-grow").remove();
 document.querySelector("#app").classList.remove("invisible");
+history.pushState(null, null, window.location.href);
+window.addEventListener('popstate', (e) => {
+  e.preventDefault();
+  history.pushState(null,window.location.href,window.location.href);
+  app.hideAll();
+});
 </script>
 </html>

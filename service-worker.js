@@ -32,14 +32,15 @@ let contentToCache = [
 ];
 
 let messages = [];
-self.addEventListener("message", (e) => {
-  if (e.data == "FORCE SYNC") {
-    syncGistStorage(true);
-  } else {
-    let data = JSON.parse(e.data)
-    messages.find(e => e.id == data.id).responseReceived(data);
-  }
-});
+
+let clearCache = () => {
+  console.log("[SPEKTI SW] Clearing cache...");
+  caches.keys().then((keyList) => {
+    return Promise.all(keyList.map((key) => {
+        return caches.delete(key);
+    }));
+  });
+}
 
 let Message = class {
   constructor(content) {
@@ -153,6 +154,7 @@ let fetchHandler = (request) => {
     })
   }
 };
+
 let syncGistStorage = (forced=false) => {
   console.log("[SPEKTI SW] sync now !",forced);
   return new Promise((resolve,reject) => {
@@ -188,6 +190,31 @@ let syncGistStorage = (forced=false) => {
   });
 };
 
+let checkCache = async () => {
+  let cacheSize = await (async () => {
+    const cacheNames = await caches.keys();
+    let total = 0;
+    const sizePromises = cacheNames.map(async cacheName => {
+      const cache = await caches.open(cacheName);
+      const keys = await cache.keys();
+      let cacheSize = 0;
+
+      await Promise.all(keys.map(async key => {
+        const response = await cache.match(key);
+        const blob = await response.blob();
+        total += blob.size;
+        cacheSize += blob.size;
+      }));
+    });
+    await Promise.all(sizePromises);
+    return total;
+  })();
+  console.log("[SPEKTI SW] Cache Size is:",cacheSize);
+  if (cacheSize > 100000000) {
+    clearCache();
+  }
+}
+
 self.addEventListener("install", (e) => {
   console.log("[SPEKTI SW] Installation");
   e.waitUntil(
@@ -203,5 +230,18 @@ self.addEventListener("fetch", (e) => {
 self.addEventListener("sync", (e) => {
   if (e.tag == "gistSync") {
     e.waitUntil(syncGistStorage());
+  }
+});
+self.addEventListener("activate", (e) => {
+  console.log("[SPEKTI SW] Activated !");
+  clearCache();
+});
+self.addEventListener("message", (e) => {
+  if (e.data == "FORCE SYNC") {
+    syncGistStorage(true);
+    checkCache();
+  } else {
+    let data = JSON.parse(e.data)
+    messages.find(e => e.id == data.id).responseReceived(data);
   }
 });
