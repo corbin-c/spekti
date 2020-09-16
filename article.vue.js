@@ -46,6 +46,11 @@ let articleView = {
         "align-items-center": this.fullContent
       }
     },
+    articleClasses() {
+      return {
+        "col": !this.fullContent
+      }
+    },
     titleClasses() {
       return {
         "card-title": true,
@@ -99,7 +104,7 @@ let articleView = {
   },
   props: ["content","fullContent","scroll"],
   template: `
-  <article class="col">
+  <article v-bind:class="articleClasses">
     <div class="card mb-3">
       <div v-bind:class="headerClasses">
         <img
