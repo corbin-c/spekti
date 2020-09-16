@@ -55,9 +55,10 @@ let sources = {
   },
   props: ["update"],
   template: `
-  <div>
-    <ul class="modal-body sources list-group list-group-flush">
-      <li v-for="source in allSources" class="list-group-item  d-flex justify-content-between align-items-center">{{ source }}
+  <div class="modal-scroll">
+    <ul class="sources list-group list-group-flush">
+      <li v-for="source in allSources" class="list-group-item  d-flex justify-content-between align-items-center">
+        {{ source.replace(/^http[s]*:\\/\\/[www\\.]*/,"") }}
         <span class="badge badge-pill" v-on:click="removeSource(source)">
           <svg class="d-inline">
             <use xlink:href="/octicons-sprite/octicons-sprite.svg#trashcan-16"></use>

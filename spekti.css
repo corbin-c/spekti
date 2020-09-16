@@ -112,26 +112,6 @@ a:hover {
 .modal-footer input, .card-footer textarea {
   width: 80%;
 }
-@media (min-width: 576px) {
-  .card-columns {
-    column-count: 2;
-  }
-}
-@media (min-width: 768px) {
-  .card-columns {
-    column-count: 2;
-  }
-}
-@media (min-width: 992px) {
-  .card-columns {
-    column-count: 3;
-  }
-}
-@media (min-width: 1200px) {
-  .card-columns {
-    column-count: 4;
-  }
-}
 .card .spinner-grow {
   display: block;
   position: relative;
@@ -172,4 +152,8 @@ button:hover .regular {
 }
 .hidden {
   visibility: hidden;
+}
+.modal-scroll {
+  word-break: break-all;
+  overflow: auto;  
 }
