@@ -1,4 +1,4 @@
-let cacheName = "spekti-v3";
+let cacheName = "spekti-cache";
 let contentToCache = [
 "/spekti/",
 "/spekti/online",

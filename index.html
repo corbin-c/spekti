@@ -172,6 +172,7 @@ window.addEventListener('popstate', (e) => {
   e.preventDefault();
   history.pushState(null,window.location.href,window.location.href);
   app.hideAll();
+  window.scrollTo(0,app.scrollY)
 });
 </script>
 </html>
