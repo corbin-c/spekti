@@ -157,3 +157,6 @@ button:hover .regular {
   word-break: break-all;
   overflow: auto;  
 }
+.list-group .w-75 {
+  word-break: break-all;
+}
