@@ -168,11 +168,15 @@ let app = new Vue({
 document.querySelector(".spinner-grow").remove();
 document.querySelector("#app").classList.remove("invisible");
 history.pushState(null, null, window.location.href);
-window.addEventListener('popstate', (e) => {
+window.addEventListener('popstate', async (e) => {
   e.preventDefault();
   history.pushState(null,window.location.href,window.location.href);
+  let scroll = app.scrollY;
   app.hideAll();
-  window.scrollTo(0,app.scrollY)
+  await (() => new Promise((resolve,reject) => {
+    setTimeout(resolve,100);
+  }))();
+  window.scrollTo(0,scroll)
 });
 </script>
 </html>

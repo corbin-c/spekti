@@ -1,4 +1,4 @@
-let cacheName = "spekti-cache";
+let cacheName = "spekti-v3";
 let contentToCache = [
 "/spekti/",
 "/spekti/online",
@@ -35,6 +35,9 @@ let messages = [];
 
 let clearCache = (force=false) => {
   console.log("[SPEKTI SW] Clearing cache...");
+  if (!force) {
+    console.log("Cache to keep:",cacheName);
+  }
   caches.keys().then((keyList) => {
     return Promise.all(keyList.map((key) => {
       if ((cacheName.indexOf(key) < 0) || (force)) {
@@ -242,6 +245,7 @@ self.addEventListener("message", (e) => {
   if (e.data == "FORCE SYNC") {
     syncGistStorage(true);
     checkCache();
+    clearCache();
   } else {
     let data = JSON.parse(e.data)
     messages.find(e => e.id == data.id).responseReceived(data);

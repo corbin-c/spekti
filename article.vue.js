@@ -98,6 +98,8 @@ let articleView = {
           : readerContent.byline;
       }
       this.readerContent = readerContent.content;
+    } else {
+      window.scrollTo(0,this.$root.scrollY)
     }
   },
   props: ["content","fullContent"],
