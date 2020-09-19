@@ -13,7 +13,6 @@ let mainView = {
       ready: false,
       noSources: false,
       singleArticle: false,
-      scrollY: 0,
       allArticles: [],
       tags: []
     }
@@ -61,7 +60,7 @@ let mainView = {
     scroll () {
       window.onscroll = () => {
         if ((this.singleArticle === false) && (this.ready)) {
-          this.scrollY = document.documentElement.scrollTop;
+          this.$root.scrollY = document.documentElement.scrollTop;
           let bottomOfWindow = Math.max(
             window.pageYOffset,
             document.documentElement.scrollTop,
@@ -135,8 +134,8 @@ let mainView = {
   template: 
   `<section v-bind:class="classes">
       <article v-if="noSources" class="card"><p class="card-body">No source has been found. You can start <a href="#" v-on:click="showSources" title="add some content">adding some RSS feeds</a> now !</p></article>
-      <article-view v-if="singleArticle !== false" v-bind:content="singleArticle" v-bind:scroll="scrollY" v-bind:fullContent="(singleArticle !== false)"></article-view>
-      <article-view v-else v-for="article in articles" v-bind:content="article" v-bind:scroll="scrollY" v-bind:fullContent="(singleArticle !== false)"></article-view>
+      <article-view v-if="singleArticle !== false" v-bind:content="singleArticle" v-bind:fullContent="(singleArticle !== false)"></article-view>
+      <article-view v-else v-for="article in articles" v-bind:content="article" v-bind:fullContent="(singleArticle !== false)"></article-view>
   </section>`
 };
 export { mainView }

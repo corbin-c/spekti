@@ -99,10 +99,10 @@ let articleView = {
       }
       this.readerContent = readerContent.content;
     } else {
-      window.scrollTo(0,this.scroll)
+      window.scrollTo(0,this.$root.scrollY)
     }
   },
-  props: ["content","fullContent","scroll"],
+  props: ["content","fullContent"],
   template: `
   <article v-bind:class="articleClasses">
     <div class="card mb-3">
