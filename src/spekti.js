@@ -6,7 +6,7 @@ let SpektiEntity = class {
     this.file = file;
     this.content = [];
     this.isReady = {};
-    this.ready = new Promise((resolve,reject) => { this.isReady = resolve; });
+    this.ready = new Promise((resolve) => { this.isReady = resolve; });
     this.getContent();
   }
   async getContent() {
@@ -23,9 +23,11 @@ let SpektiEntity = class {
     await this.gist.putContent(this.file,JSON.stringify(this.content));
   }
   get allContent() {
-    return new Promise(async (resolve,reject) => {
-      await this.ready;
-      resolve(this.content);
+    return new Promise((resolve) => {
+      (async () => {
+        await this.ready;
+        resolve(this.content);
+      )();
     });
   }
 }
@@ -63,17 +65,19 @@ let Tags = class extends SpektiEntity {
     }
   }
   get allTags() {
-    return new Promise(async (resolve,reject) => {
-      let all = ["fav","reviewed"];
-      let content = await this.allContent;
-      content.map(article => {
-        article.tags.map(tag => {
-          if (!all.some(e => e==tag)) {
-            all.push(tag);
-          }
+    return new Promise((resolve) => {
+      (async () => {
+        let all = ["fav","reviewed"];
+        let content = await this.allContent;
+        content.map(article => {
+          article.tags.map(tag => {
+            if (!all.some(e => e==tag)) {
+              all.push(tag);
+            }
+          });
         });
-      });
-      resolve(all);
+        resolve(all);
+      })();
     });
   }
 }
@@ -150,7 +154,7 @@ let Spekti = class {
     this.gist = gist;
     this.entities = entities;
     this.isReady = {};
-    this.ready = new Promise((resolve,reject) => { this.isReady = resolve; });
+    this.ready = new Promise((resolve) => { this.isReady = resolve; });
     this.init();
   }
   async init() {
