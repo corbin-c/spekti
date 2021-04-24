@@ -47,7 +47,7 @@ export default {
   },
   mounted() {
     (async () => {
-      let online = await fetch("/online");
+      let online = await fetch("/spekti/online");
       online = await online.text();
       if (online == "false") {
         this.$root.logged = true;
