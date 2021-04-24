@@ -169,7 +169,9 @@ let syncGistStorage = (forced=false) => {
         reject(true);
       } else {
         localStorage("GET").then(storage => {
-          Object.keys(storage).map(key => {
+          Object.keys(storage).filter(key => {
+              return !(["gistId","token"].includes(key));
+            }).map(key => {
             storage[key] = { content:storage[key] }
           });
           if (Object.keys(storage).length > 0) {
