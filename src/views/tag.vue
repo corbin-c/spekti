@@ -1,6 +1,23 @@
-import { articleView } from "/spekti/article.vue.js";
+<template>
+  <section class="mt-3 mb-5">
+    <article-view v-if="viewArticle !== false" v-bind:content="viewArticle" v-bind:fullContent="(viewArticle !== false)"></article-view>
+    <div v-else class="card mb-3">
+      <h3 class="card-header card-title">Articles tagged "{{ tag }}"</h3>
+      <p class="card-body card-text"  v-if="taggedContent.length == 0">There is no content for this tag yet. Start reviewing or tagging articles to see something here.</p>
+      <ul class="list-group list-group-flush" v-else>
+        <li class="list-group-item d-flex justify-content-between align-items-center" v-for="article in taggedContent" :key="article.url" v-on:click="showArticle">
+          {{ article.title }}
+          <span class="d-none">{{ article.url }}</span>
+          <span class="badge badge-info badge-pill" v-for="otherTag in otherTags(article)" :key="otherTag" v-on:click="changeTag(otherTag)">{{ otherTag }}</span>
+        </li>
+      </ul>
+    </div>
+  </section>
+</template>
+<script>
+import articleView from "./article.vue";
 
-let tagView = {
+export default {
   data: function() {
     return {
       allTags: [],
@@ -57,21 +74,5 @@ let tagView = {
     this.getTags()
   },
   props: ["tag"],
-  template: `
-  <section class="mt-3 mb-5">
-    <article-view v-if="viewArticle !== false" v-bind:content="viewArticle" v-bind:fullContent="(viewArticle !== false)"></article-view>
-    <div v-else class="card mb-3">
-      <h3 class="card-header card-title">Articles tagged "{{ tag }}"</h3>
-      <p class="card-body card-text"  v-if="taggedContent.length == 0">There is no content for this tag yet. Start reviewing or tagging articles to see something here.</p>
-      <ul class="list-group list-group-flush" v-else>
-        <li class="list-group-item d-flex justify-content-between align-items-center" v-for="article in taggedContent" v-on:click="showArticle">
-          {{ article.title }}
-          <span class="d-none">{{ article.url }}</span>
-          <span class="badge badge-info badge-pill" v-for="otherTag in otherTags(article)" v-on:click="changeTag(otherTag)">{{ otherTag }}</span>
-        </li>
-      </ul>
-    </div>
-  </section>
-`
 };
-export { tagView }
+</script>

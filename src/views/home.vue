@@ -1,19 +1,4 @@
-import { mainView } from "/spekti/main.vue.js";
-import { tagView } from "/spekti/tag.vue.js";
-import { notesView } from "/spekti/notes.vue.js";
-let home = {
-  methods: {
-    helloLogin() {
-      hello.login("github",{scope:"gist"});
-    },
-  },
-  components: {
-    "main-view": mainView,
-    "tag-view": tagView,
-    "notes-view": notesView
-  },
-  props: ["update","tag","notes"],
-  template: `
+<template>
   <main>
     <div class="text-center p-5 m-3" v-if="this.$root.logged === false">
       <p>In order to use Spekti, please login to your GitHub account and authorize the app.</p><p>Spekti only uses your GitHub account to store data as Gists.</p>
@@ -28,6 +13,29 @@ let home = {
         <notes-view v-else-if="notes !== false" v-bind:update="update"></notes-view>
         <main-view v-else v-bind:update="update"></main-view>      
       </template>
-  </main>`
+  </main>
+</template>
+
+<script>
+import mainView from "./main.vue";
+import tagView from "./tag.vue";
+import notesView from "./notes.vue";
+export default {
+  mounted() {
+    this.$nextTick(function() {
+      console.log(this.$root.logged);
+    });
+  },
+  methods: {
+    helloLogin() {
+      this.$root.$emit("hello-login",true);
+    },
+  },
+  components: {
+    "main-view": mainView,
+    "tag-view": tagView,
+    "notes-view": notesView
+  },
+  props: ["update","tag","notes"],
 };
-export { home }
+</script>

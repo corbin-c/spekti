@@ -1,4 +1,27 @@
-let sources = {
+<template>
+  <div class="modal-scroll">
+    <ul class="sources list-group list-group-flush">
+      <li v-for="source in allSources" :key="source" class="list-group-item  d-flex justify-content-between align-items-center">
+        {{ sourceReplace(source) }}
+        <span class="badge badge-pill" v-on:click="removeSource(source)">
+          <svg class="d-inline">
+            <use xlink:href="/octicons-sprite/octicons-sprite.svg#trashcan-16"></use>
+          </svg>
+        </span>
+      </li>
+    </ul>
+    <div class="modal-footer bg-light">
+      <input type="text" v-model="sourceUrl" v-bind:class="inputClasses" placeholder="New source URL">
+      <button type="button" class="btn btn-success" v-on:click="addSource" v-bind:disabled="disabled">
+        <svg class="d-inline">
+          <use xlink:href="/octicons-sprite/octicons-sprite.svg#check-circle-24"></use>
+        </svg>
+      </button>
+    </div>
+  </div>
+</template>
+<script>
+export default {
   data: function() {
     return {
       sources: [],
@@ -26,6 +49,9 @@ let sources = {
     }
   },
   methods: {
+    sourceReplace(url) {
+      return url.replace(/^http[s]*:\/\/[www.]*/,"")
+    },
     async getSources() {
       await this.$root.spekti.ready;
       this.sources = await this.$root.spekti.rss.allContent;
@@ -54,27 +80,5 @@ let sources = {
     this.getSources();
   },
   props: ["update"],
-  template: `
-  <div class="modal-scroll">
-    <ul class="sources list-group list-group-flush">
-      <li v-for="source in allSources" class="list-group-item  d-flex justify-content-between align-items-center">
-        {{ source.replace(/^http[s]*:\\/\\/[www\\.]*/,"") }}
-        <span class="badge badge-pill" v-on:click="removeSource(source)">
-          <svg class="d-inline">
-            <use xlink:href="/octicons-sprite/octicons-sprite.svg#trashcan-16"></use>
-          </svg>
-        </span>
-      </li>
-    </ul>
-    <div class="modal-footer bg-light">
-      <input type="text" v-model="sourceUrl" v-bind:class="inputClasses" placeholder="New source URL">
-      <button type="button" class="btn btn-success" v-on:click="addSource" v-bind:disabled="disabled">
-        <svg class="d-inline">
-          <use xlink:href="/octicons-sprite/octicons-sprite.svg#check-circle-24"></use>
-        </svg>
-      </button>
-    </div>
-  </div>
-  `
 };
-export { sources }
+</script>

@@ -1,12 +1,20 @@
-import { DataGists } from "https://corbin-c.github.io/datagists/DataGists.js";
-import { Spekti } from "/spekti/spekti.js";
-import { Rss } from "/spekti/rss.js";
+<template>
+  <section v-bind:class="classes">
+      <article v-if="noSources" class="card"><p class="card-body">No source has been found. You can start <a href="#" v-on:click="showSources" title="add some content">adding some RSS feeds</a> now !</p></article>
+      <article-view v-if="singleArticle !== false" v-bind:content="singleArticle" v-bind:fullContent="(singleArticle !== false)"></article-view>
+      <article-view v-else v-for="article in articles" :key="article.url" v-bind:content="article" v-bind:fullContent="(singleArticle !== false)"></article-view>
+  </section>
+</template>
+<script>
+import { Spekti } from "@/spekti.js";
+import { Rss } from "@/rss.js";
+import { DataGists } from "@corbin-c/datagists/DataGists.js";
 
-import { articleView } from "/spekti/article.vue.js";
+import articleView from "./article.vue";
 
 const maxItemsOnPage = 12;
       
-let mainView = {
+export default {
   data: function() {
     return {
       maxItems: maxItemsOnPage,
@@ -127,15 +135,11 @@ let mainView = {
       try {
         await this.$root.spekti.ready;
         navigator.serviceWorker.controller.postMessage("FORCE SYNC");
-      } catch {}
+      } catch {
+        console.log("not ready yet")
+      }
     });
   },
   props: ["update"],
-  template: 
-  `<section v-bind:class="classes">
-      <article v-if="noSources" class="card"><p class="card-body">No source has been found. You can start <a href="#" v-on:click="showSources" title="add some content">adding some RSS feeds</a> now !</p></article>
-      <article-view v-if="singleArticle !== false" v-bind:content="singleArticle" v-bind:fullContent="(singleArticle !== false)"></article-view>
-      <article-view v-else v-for="article in articles" v-bind:content="article" v-bind:fullContent="(singleArticle !== false)"></article-view>
-  </section>`
 };
-export { mainView }
+</script>

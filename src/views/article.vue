@@ -1,7 +1,43 @@
-import { Reader } from "/spekti/reader.js";
-import { tagBar } from "/spekti/tagbar.vue.js";
+<template>
+  <article v-bind:class="articleClasses">
+    <div class="card mb-3">
+      <div v-bind:class="headerClasses">
+        <img
+          v-if="content.img.length > 0"
+          v-bind:src="content.img"
+          v-bind:class="imgClasses"
+          v-on:click="toggleFullContent"
+          v-bind:alt="content.title">
+        <h3 
+          v-bind:class="titleClasses" v-on:click="toggleFullContent">
+          {{ content.title }}
+        </h3>
+      </div>
+      <tag-bar v-if="fullContent" v-bind:url="content.link" v-bind:title="content.title"></tag-bar>
+      <div class="card-body" v-if="fullContent">
+        <p v-html="readerContent" v-bind:class="contentClasses"></p>
+      </div>
+      <div class="card-body" v-else>
+        <p class="card-text">{{ abstract }}</p>
+      </div>
+      <button type="button" id="close" class="btn btn-info" data-dismiss="modal" aria-label="Close" v-if="fullContent" v-on:click="toggleFullContent">
+        <span aria-hidden="true">&times;</span>
+      </button>
+      <div class="card-footer">
+        <p class="card-text">
+          <small class="text-muted">
+           {{ footer }}<a v-bind:href="content.link" v-bind:title="'Open article « '+content.title+' »'" target="_blank">Source</a>
+          </small>
+        </p>
+      </div>
+    </div>
+  </article>
+</template>
+<script>
+import { Reader } from "@/reader.js";
+import tagBar from "@/components/tagbar.vue";
 
-let articleView = {
+export default {
   data: function() {
     return {
       readerContent: ""
@@ -12,7 +48,6 @@ let articleView = {
   },
   computed: {
     footer() {
-      let footString = this.date;
       if ((this.date == "") && (this.content.author == "")) {
         return "";
       } else if (this.content.author == "") {
@@ -103,39 +138,5 @@ let articleView = {
     }
   },
   props: ["content","fullContent"],
-  template: `
-  <article v-bind:class="articleClasses">
-    <div class="card mb-3">
-      <div v-bind:class="headerClasses">
-        <img
-          v-if="content.img.length > 0"
-          v-bind:src="content.img"
-          v-bind:class="imgClasses"
-          v-on:click="toggleFullContent"
-          v-bind:alt="content.title">
-        <h3 
-          v-bind:class="titleClasses" v-on:click="toggleFullContent">
-          {{ content.title }}
-        </h3>
-      </div>
-      <tag-bar v-if="fullContent" v-bind:url="content.link" v-bind:title="content.title"></tag-bar>
-      <div class="card-body" v-if="fullContent">
-        <p v-html="readerContent" v-bind:class="contentClasses"></p>
-      </div>
-      <div class="card-body" v-else>
-        <p class="card-text">{{ abstract }}</p>
-      </div>
-      <button type="button" id="close" class="btn btn-info" data-dismiss="modal" aria-label="Close" v-if="fullContent" v-on:click="toggleFullContent">
-        <span aria-hidden="true">&times;</span>
-      </button>
-      <div class="card-footer">
-        <p class="card-text">
-          <small class="text-muted">
-           {{ footer }}<a v-bind:href="content.link" v-bind:title="'Open article « '+content.title+' »'" target="_blank">Source</a>
-          </small>
-        </p>
-      </div>
-    </div>
-  </article>`
 };
-export { articleView }
+</script>

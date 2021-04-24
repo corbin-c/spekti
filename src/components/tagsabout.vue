@@ -1,4 +1,21 @@
-let tagsAbout = {
+<template>
+  <div>
+    <div class="modal-body d-flex justify-content-around flex-wrap align-content-around">
+      <p v-if="allTags.length == 0">There is no tag yet. You can add a custom tag using the input below.</p>
+      <button v-else v-bind:class="tagClasses(tag)" v-for="tag in allTags" :key="tag" v-on:click="toggle(tag)" v-bind:title="title(tag)">{{tag}}</button>
+    </div>
+    <div class="modal-footer bg-light">
+      <input type="text" class="form-control mx-auto" v-model="newTag" placeholder="New tag">
+      <button type="button" class="btn btn-success" v-on:click="addTag" v-bind:disabled="disabled">
+        <svg class="d-inline">
+          <use xlink:href="/octicons-sprite/octicons-sprite.svg#check-circle-24"></use>
+        </svg>
+      </button>
+    </div>
+  </div>
+</template>
+<script>
+export default {
   data: function() {
     return {
       tags: [],
@@ -71,21 +88,5 @@ let tagsAbout = {
     this.thisTags();
   },
   props: ["update","details"],
-  template: `
-  <div>
-    <div class="modal-body d-flex justify-content-around flex-wrap align-content-around">
-      <p v-if="allTags.length == 0">There is no tag yet. You can add a custom tag using the input below.</p>
-      <button v-else v-bind:class="tagClasses(tag)" v-for="tag in allTags" v-on:click="toggle(tag)" v-bind:title="title(tag)">{{tag}}</button>
-    </div>
-    <div class="modal-footer bg-light">
-      <input type="text" class="form-control mx-auto" v-model="newTag" placeholder="New tag">
-      <button type="button" class="btn btn-success" v-on:click="addTag" v-bind:disabled="disabled">
-        <svg class="d-inline">
-          <use xlink:href="/octicons-sprite/octicons-sprite.svg#check-circle-24"></use>
-        </svg>
-      </button>
-    </div>
-  </div>
-  `
 };
-export { tagsAbout }
+</script>
