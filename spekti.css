@@ -7,6 +7,9 @@ nav {
 nav h2 {
   margin-left: 2rem;
 }
+nav *, main section article h3 {
+  cursor: pointer;
+}
 .spinner-grow {
   display: block;
   position: absolute;
