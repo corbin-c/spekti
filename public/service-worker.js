@@ -1,34 +1,21 @@
-let cacheName = "spekti-v4";
+let cacheName = "spekti-v5";
 let contentToCache = [
 "/spekti/",
 "/spekti/online",
-"/spekti/spekti.js",
-"/spekti/rss.js",
-"/spekti/reader.js",
-"/spekti/article.vue.js",
-"/spekti/hello.all.min.js",
-"/spekti/home.vue.js",
 "/spekti/index.html",
-"/spekti/main.vue.js",
 "/spekti/manifest.json",
-"/spekti/modal.vue.js",
-"/spekti/notesabout.vue.js",
-"/spekti/notes.vue.js",
-"/spekti/sources.vue.js",
 "/spekti/spekti.css",
-"/spekti/tagbar.vue.js",
-"/spekti/tagsabout.vue.js",
-"/spekti/tags.vue.js",
-"/spekti/tag.vue.js",
+"/spekti/js/app.3b7df142.js",
+"/spekti/js/app.3b7df142.js.map",
+"/spekti/js/chunk-vendors.761ab3f4.js",
+"/spekti/js/chunk-vendors.761ab3f4.js.map",
 "/spekti/logo/192.png",
 "/spekti/logo/512.png",
 "/spekti/logo/favicon.ico",
 "/spekti/logo/logo.svg",
 "/spekti/logo/maskable.png",
-"https://corbin-c.github.io/datagists/DataGists.js",
-"https://corbin-c.github.io/readability/Readability.js",
+"/octicons-sprite/octicons-sprite.svg",
 "https://maxcdn.bootstrapcdn.com/bootstrap/4.5.0/css/bootstrap.min.css",
-"https://cdn.jsdelivr.net/npm/vue/dist/vue.js"
 ];
 
 let messages = [];
