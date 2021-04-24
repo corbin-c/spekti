@@ -27,7 +27,7 @@ let SpektiEntity = class {
       (async () => {
         await this.ready;
         resolve(this.content);
-      )();
+      })();
     });
   }
 }
