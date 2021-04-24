@@ -21,3 +21,23 @@ Unless all your data sources provides CORS headers (which is very unlikely),
 you'll need a CORS-Proxy. Spekti default proxy is [CORS-Anywhere](https://github.com/Rob--W/cors-anywhere/)
 hosted on Heroku and developed by Rob Wu. (Thank you Rob !) However, please
 consider changing this parameter to provide your own proxy.
+
+## Project setup
+```
+npm install
+```
+
+### Compiles and hot-reloads for development
+```
+npm run serve
+```
+
+### Compiles and minifies for production
+```
+npm run build
+```
+
+### Lints and fixes files
+```
+npm run lint
+```
