@@ -1,6 +1,6 @@
-import { mainView } from "/spekti/main.vue.js";
-import { tagView } from "/spekti/tag.vue.js";
-import { notesView } from "/spekti/notes.vue.js";
+import { mainView } from "./main.vue.js";
+import { tagView } from "./tag.vue.js";
+import { notesView } from "./notes.vue.js";
 let home = {
   methods: {
     helloLogin() {

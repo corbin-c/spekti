@@ -1,7 +1,7 @@
-import { sources } from "/spekti/sources.vue.js";
-import { tags } from "/spekti/tags.vue.js";
-import { tagsAbout } from "/spekti/tagsabout.vue.js";
-import { notesAbout } from "/spekti/notesabout.vue.js";
+import { sources } from "@/components/sources.vue.js";
+import { tags } from "@/components/tags.vue.js";
+import { tagsAbout } from "@/components/tagsabout.vue.js";
+import { notesAbout } from "@/components/notesabout.vue.js";
 let modal = {
   computed: {
     title() {

@@ -1,4 +1,4 @@
-import { articleView } from "/spekti/article.vue.js";
+import { articleView } from "./article.vue.js";
 
 let tagView = {
   data: function() {
