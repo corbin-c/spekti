@@ -1,0 +1,33 @@
+{
+  "background_color": "#b0c1d4",
+  "description": "Keep an eye on what's matter",
+  "display": "fullscreen",
+  "icons": [
+    {
+      "src": "/spekti/logo/logo.svg",
+      "sizes": "32x32 64x64 128x128 192x192 512x512",
+      "type": "image/svg+xml"
+    },
+    {
+      "src": "/spekti/logo/512.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    },
+    {
+      "src": "/spekti/logo/192.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "/spekti/logo/maskable.png",
+      "sizes": "196x196",
+      "type": "image/png",
+      "purpose": "maskable"
+    }
+  ],
+  "name": "Spekti",
+  "short_name": "Spekti",
+  "start_url": "/spekti/",
+  "scope": "/spekti/",
+  "theme_color": "#b0c1d4"
+}
