@@ -1,4 +1,4 @@
-const CORS_PROXY = "https://cors-anywhere.herokuapp.com/";
+const CORS_PROXY = "https://spekticors.herokuapp.com/";
 const FEED_ELEMENTS = [
   {title:["title"]},
   {link:["link"]},

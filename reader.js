@@ -1,5 +1,5 @@
 import { Readability } from "https://corbin-c.github.io/readability/Readability.js";
-const CORS_PROXY = "https://cors-anywhere.herokuapp.com/";
+const CORS_PROXY = "https://spekticors.herokuapp.com/";
 let Reader = async function(url) {
   let doc = await fetch(CORS_PROXY+url);
   doc = await doc.text();
