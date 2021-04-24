@@ -10,6 +10,7 @@
   "dependencies": {
     "@corbin-c/datagists": "github:corbin-c/datagists",
     "core-js": "^3.6.5",
+    "hellojs": "^1.19.3",
     "readability": "github:corbin-c/readability",
     "vue": "^2.6.11"
   },
