@@ -1,12 +1,12 @@
-let cacheName = "spekti-v5";
+let cacheName = "spekti-v6";
 let contentToCache = [
 "/spekti/",
 "/spekti/online",
 "/spekti/index.html",
 "/spekti/manifest.json",
 "/spekti/spekti.css",
-"/spekti/js/app.3b7df142.js",
-"/spekti/js/app.3b7df142.js.map",
+"/spekti/js/app.69b9f378.js",
+"/spekti/js/app.69b9f378.js.map",
 "/spekti/js/chunk-vendors.761ab3f4.js",
 "/spekti/js/chunk-vendors.761ab3f4.js.map",
 "/spekti/logo/192.png",
