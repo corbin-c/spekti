@@ -38,6 +38,7 @@ export default {
     return {
       appName: "Spekti",
       currentRoute: window.location.pathname.slice(11),
+      serviceWorker: true,
       modal: false,
       modalDetails: false,
       tag: false,
@@ -47,7 +48,7 @@ export default {
   },
   mounted() {
     (async () => {
-      let online = await fetch("/spekti/online");
+      let online = await fetch(((process.env.NODE_ENV === "production") ? "/spekti":"") + "/online");
       online = await online.text();
       if (online == "false") {
         this.$root.logged = true;
@@ -56,7 +57,7 @@ export default {
     hello.on("auth.login", (auth) => {
       this.$root.logged = auth.authResponse.access_token;
     });
-    hello.init({github:"e039324ddce920ed3111"});
+    hello.init({github:((process.env.NODE_ENV === "production") ? "e039324ddce920ed3111" : "0cee4fa1d5515821c183")});
     document.querySelector(".spinner-grow").remove();
     document.querySelector("#app").classList.remove("invisible");
     history.pushState(null, null, window.location.href);
@@ -72,7 +73,9 @@ export default {
     });
   },
   created() {
-    this.registerWorker();
+    if (this.serviceWorker) {
+      this.registerWorker();
+    }
     this.$root.$on("hideModal",this.hideModal);
     this.$root.$on("showModal",this.setModal);
     this.$root.$on("modalDetails",this.setModalDetails);
@@ -90,7 +93,7 @@ export default {
     },
     registerWorker() {
       if('serviceWorker' in navigator) {
-        navigator.serviceWorker.register("/spekti/service-worker.js")
+        navigator.serviceWorker.register(((process.env.NODE_ENV === "production") ? "/spekti":"") + "/service-worker.js")
           .then(e => e.update());
         localStorage.setItem("synced",true);
         navigator.serviceWorker.onmessage = (e) => {
