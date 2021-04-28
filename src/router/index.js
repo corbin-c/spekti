@@ -36,6 +36,10 @@ const routes = [
     name: "Callback",
     component: Callback
   },
+  {
+    path: "*",
+    redirect: "/"
+  }
   //~ {
     //~ path: "/about",
     //~ name: "About",
