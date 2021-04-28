@@ -1,7 +1,7 @@
 <template>
-  <div id="app" class="container-fluid invisible">
+  <div id="app" class="container-fluid">
     <nav class="row navbar sticky-top navbar-expand navbar-light bg-light border-bottom border-info">
-      <h2 class="text-info" v-on:click="hideAll">{{ appName }}</h2>
+      <router-link to="/" title="Go back to articles list"><h2 class="text-info">{{ appName }}</h2></router-link>
       <ul class="navbar-nav ml-auto" v-if="$root.spekti !== false">
         <li class="nav-item">
           <a class="nav-link" title="Manage sources" v-on:click="setModal('sources')">Sources</a>
@@ -10,16 +10,12 @@
           <a class="nav-link" title="Manage tags" v-on:click="setModal('tags')">Tags</a>
         </li>
         <li class="nav-item">
-          <a class="nav-link" title="Manage notes" v-on:click="showNotes">Notes</a>
+          <router-link class="nav-link" to="/notes" title="Manage notes">Notes</router-link>
         </li>
       </ul>
     </nav>
-    <app-home v-bind:update="lastUpdate" v-bind:tag="tag" v-bind:notes="notes"></app-home>
-    <app-modal
-      v-bind:content="modal"
-      v-bind:update="lastUpdate"
-      v-bind:details="modalDetails">
-    </app-modal>
+    <router-view />
+    <app-modal v-bind:content="modal" v-bind:details="modalDetails" />
     <footer class="fixed-bottom text-right border-top border-info p-1 bg-light">
       <small class="p-2">
         <a href="https://github.com/corbin-c/spekti" title="Spekti repository by corbin-c on Github">Contribute on Github</a>
@@ -29,68 +25,37 @@
 </template>
 
 <script>
-import home from "./views/home.vue";
-import * as hello from "hellojs/dist/hello.all.min.js";
 import modal from "./components/modal.vue";
 export default {
   name: 'App',
   data: function() {
     return {
       appName: "Spekti",
-      currentRoute: window.location.pathname.slice(11),
-      serviceWorker: true,
+      serviceWorker: false,
       modal: false,
       modalDetails: false,
-      tag: false,
-      notes: false,
-      lastUpdate: (new Date()).valueOf()
     }
   },
   mounted() {
     (async () => {
       let online = await fetch(((process.env.NODE_ENV === "production") ? "/spekti":"") + "/online");
       online = await online.text();
-      if (online == "false") {
-        this.$root.logged = true;
+      console.log(online.includes("true"));
+      if (online.includes("true")) {
+        this.$store.dispatch("onlineAction", true);
       }
     })();
-    hello.on("auth.login", (auth) => {
-      this.$root.logged = auth.authResponse.access_token;
-    });
-    hello.init({github:((process.env.NODE_ENV === "production") ? "e039324ddce920ed3111" : "0cee4fa1d5515821c183")});
-    document.querySelector(".spinner-grow").remove();
-    document.querySelector("#app").classList.remove("invisible");
-    history.pushState(null, null, window.location.href);
-    window.addEventListener('popstate', async (e) => {
-      e.preventDefault();
-      history.pushState(null,window.location.href,window.location.href);
-      let scroll = this.$root.scrollY;
-      this.hideAll();
-      await (() => new Promise((resolve) => {
-        setTimeout(resolve,100);
-      }))();
-      window.scrollTo(0,scroll)
-    });
   },
   created() {
     if (this.serviceWorker) {
       this.registerWorker();
     }
     this.$root.$on("hideModal",this.hideModal);
-    this.$root.$on("showModal",this.setModal);
-    this.$root.$on("modalDetails",this.setModalDetails);
-    this.$root.$on("update",this.updateView);
-    this.$root.$on("showTag",this.showTag);
-    this.$root.$on("hello-login",this.login);
   },
   components: {
-    "app-home": home,
     "app-modal": modal,
   },
   methods: {
-    login() {
-      hello.login("github",{scope:"gist"});
-    },
     registerWorker() {
       if('serviceWorker' in navigator) {
         navigator.serviceWorker.register(((process.env.NODE_ENV === "production") ? "/spekti":"") + "/service-worker.js")
@@ -137,36 +102,10 @@ export default {
     setModalDetails(target) {
       this.modalDetails = target;
     },
-    showTag(target) {
-      this.notes = false;
-      this.tag = target;
-    },
-    showNotes() {
-      this.hideArticle();
-      this.tag = false;
-      this.notes = true;
-    },
-    hideNotes() {
-      this.notes = false;
-    },
-    updateView() {
-      this.lastUpdate = (new Date()).valueOf();
-    },
     hideModal() {
       this.setModal(false);
       this.setModalDetails(false);
     },
-    hideArticle() {
-      this.$emit("closeFullArticle","");
-    },
-    hideTags() {
-      this.tag = false;
-    },
-    hideAll() {
-      this.hideArticle();
-      this.hideTags();
-      this.hideNotes();
-    }
   }
 };
 </script>
