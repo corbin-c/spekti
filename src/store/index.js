@@ -60,6 +60,12 @@ export default new Vuex.Store({
   actions: {
     //commit mutations in store / gists / localStorage
     async connectAction({commit, state}) {
+      ["tags","notes","rss"].forEach(key => {
+        const content = localStorage.getItem(key);
+        if (content) {
+          commit("fill",{ key, content: JSON.parse(content) });
+        }
+      });
       if (state.online === true
         && state.connected !== true
         && typeof state.login !== "boolean") {
@@ -209,9 +215,13 @@ export default new Vuex.Store({
       return state.tags.find(e => e.url == url);
     },
     otherTags: (state) => (url,tag) => {
-      return state.tags
-              .find(article => article.url == url)
-                .tags.filter(t => t != tag);
+      try {
+        return state.tags
+                .find(article => article.url == url)
+                  .tags.filter(t => t != tag);
+      } catch {
+        return [];
+      }
     },
     taggedContent: (state) => (tag) => {
       return state.tags.filter(article => article.tags.includes(tag));
