@@ -1,7 +1,7 @@
 <template>
   <div id="app" class="container-fluid">
     <nav class="row navbar sticky-top navbar-expand navbar-light bg-light border-bottom border-info">
-      <router-link to="/" title="Go back to articles list"><h2 class="text-info">{{ appName }}</h2></router-link>
+      <router-link to="/" class="text-decoration-none" title="Go back to articles list"><h2 class="text-info">{{ appName }}</h2></router-link>
       <ul class="navbar-nav ml-auto" v-if="$root.spekti !== false">
         <li class="nav-item">
           <a class="nav-link" title="Manage sources" v-on:click="setModal('sources')">Sources</a>
