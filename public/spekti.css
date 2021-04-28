@@ -137,6 +137,9 @@ a:hover {
   height: auto;
   max-width: 100%;
 }
+button {
+  background: none;
+}
 .tagbar {
   top: calc(4rem - 2.5px);
   background: #f7f7f7;
