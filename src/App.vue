@@ -44,7 +44,7 @@ export default {
   mounted() {
     let path = window.location.search.split("?path")[1];
     if (typeof path !== "undefined") {
-      path = "/"+path;
+      path = decodeURIComponent("/"+path);
       this.$router.push({path});
     }
     this.isOnline();
