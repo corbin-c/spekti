@@ -82,8 +82,7 @@ export default new Vuex.Store({
           commit("fill",{ key, content: JSON.parse(content) });
         }
       });
-      if (state.online === true
-        && state.connected !== true
+      if (state.connected !== true
         && typeof state.login !== "boolean") {
         commit("connected","pending");
         gist = new DataGists(state.login);
@@ -102,11 +101,12 @@ export default new Vuex.Store({
           if (["tags","notes","rss"].includes(key)) {
             const content = gist.files[key].content;
             commit("fill",{ key, content: JSON.parse(content) });
-            if (!localStorage.getItem(key)) {
+            if (!localStorage.getItem(key)) { //only populate localstorage this way if empty
               localStorage.setItem(key, content);
             }
           }
         });
+        localStorage.setItem("gist", gist.id);
         //should we sync Service Worker here?
       }
     },
@@ -117,9 +117,24 @@ export default new Vuex.Store({
       }
       dispatch("connectAction");
     },
-    onlineAction({commit, dispatch}, value) {
+    onlineAction({commit}, value) {
       commit("online", value);
-      dispatch("connectAction");
+      let informSW = (online, retry=false) => { // inform service worker about it
+        if ("serviceWorker" in navigator) {
+          try {
+            navigator.serviceWorker.controller.postMessage(JSON.stringify({
+              online
+            }));
+          } catch {
+            if (!retry) {
+              setTimeout(() => {
+                informSW(online, true)
+              },10000);
+            }
+          }
+        }
+      }
+      informSW();
     },
     gistChange({commit, state}, { type, key, content, filter, find }) {
       commit(type, { key, content, filter, find });
