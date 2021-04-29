@@ -5,6 +5,7 @@ import Main from "../views/main.vue"
 import Tag from "../views/tag.vue"
 import Notes from "../views/notes.vue"
 import Callback from "../views/callback.vue"
+import Article from "../views/article.vue"
 
 Vue.use(VueRouter)
 
@@ -25,10 +26,21 @@ const routes = [
         props: true
       },
       {
+        path: "source/:source",
+        name: "Source",
+        component: Main,
+        props: true
+      },
+      {
         path: "notes",
         name: "Notes",
         component: Notes
-      }
+      },
+      {
+        path: "article",
+        name: "Article",
+        component: Article
+      },
     ]
   },
   {
