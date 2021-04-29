@@ -71,9 +71,6 @@ export default {
         img: ""
       }
     },
-    hideArticle() {
-      this.viewArticle = false;
-    },
     submitNote() {
       if (this.edit === false) {
         this.addNote();
@@ -97,10 +94,6 @@ export default {
       this.edit = id;
       this.newNote = content;
     },
-  },
-  created: function() {
-    this.$root.$on("closeFullArticle",this.hideArticle);
-    this.$on("hideArticle",this.hideArticle);
   },
   props: ["update"],
 }
