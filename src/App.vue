@@ -18,7 +18,7 @@
     <app-modal v-bind:component="modal.component" v-bind:details="modal.details" />
     <footer class="fixed-bottom text-right border-top border-info bg-light d-flex justify-content-between">
       <small class="p-2">
-        <a v-if="$store.state.connected" class="text-danger" title="Logout from Spekti" v-on:click="logout">
+        <a v-if="$store.state.connected" href="/" class="text-danger" title="Logout from Spekti" v-on:click="logout">
           Logout
         </a>
       </small>
@@ -42,7 +42,7 @@ export default {
     }
   },
   mounted() {
-    let path = window.location.search.split("?path")[1];
+    let path = window.location.search.split("?path=")[1];
     if (typeof path !== "undefined") {
       path = decodeURIComponent("/"+path);
       this.$router.push({path});

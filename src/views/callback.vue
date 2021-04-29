@@ -33,7 +33,6 @@ export default {
         });
         return obj;
       })();
-      console.log(search)
       let clientId = ((process.env.NODE_ENV === "production")
         ? "e039324ddce920ed3111"
         : "0cee4fa1d5515821c183");
