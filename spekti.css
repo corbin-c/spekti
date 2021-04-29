@@ -1,5 +1,5 @@
 nav {
-  background-image: url("/spekti/logo/logo.svg");
+  background-image: url("./logo/logo.svg");
   background-repeat: no-repeat;
   background-position-x: -6px;
   background-position-y: 1px;
@@ -7,7 +7,7 @@ nav {
 nav h2 {
   margin-left: 2rem;
 }
-nav *, main section article h3 {
+nav * {
   cursor: pointer;
 }
 .spinner-grow {
@@ -136,6 +136,9 @@ a:hover {
   margin: auto;
   height: auto;
   max-width: 100%;
+}
+button {
+  background: none;
 }
 .tagbar {
   top: calc(4rem - 2.5px);
