@@ -1,13 +1,13 @@
 <template>
   <div class="modal-scroll">
     <ul class="sources list-group list-group-flush">
-      <li v-for="source in allSources" :key="source" class="list-group-item  d-flex justify-content-between align-items-center">
-        {{ sourceReplace(source) }}
-        <span class="badge badge-pill" v-on:click="removeSource(source)">
+      <li v-for="(source, index) in $store.state.rss" :key="source" class="list-group-item  d-flex justify-content-between align-items-center">
+        <commit-link title="view only articles from this source" class="text-secondary text-decoration-none" :to="'/source/'+index" event="hideModal">{{ sourceReplace(source) }}</commit-link>
+        <button class="badge badge-pill" title="Remove this source" v-on:click="removeSource(source)">
           <svg class="d-inline">
             <use xlink:href="/octicons-sprite/octicons-sprite.svg#trashcan-16"></use>
           </svg>
-        </span>
+        </button>
       </li>
     </ul>
     <div class="modal-footer bg-light">
@@ -21,22 +21,19 @@
   </div>
 </template>
 <script>
+import commitLink from "@/components/commit-link.vue";
 export default {
   data: function() {
     return {
-      sources: [],
       sourceUrl: ""
     }
   },
+  components: {
+    "commit-link": commitLink
+  },
   watch: {
-    update: function () {
-      this.getSources();
-    }
   },
   computed: {
-    allSources() {
-      return this.sources;
-    },
     inputClasses() {
       let classes = "form-control mx-auto";
       if ((this.sourceUrl !== "") && (!this.testURL(this.sourceUrl))) {
@@ -50,34 +47,23 @@ export default {
   },
   methods: {
     sourceReplace(url) {
-      return url.replace(/^http[s]*:\/\/[www.]*/,"")
-    },
-    async getSources() {
-      await this.$root.spekti.ready;
-      this.sources = await this.$root.spekti.rss.allContent;
+      return url.replace(/^http[s]*:\/\/(www.)*/,"")
     },
     testURL(url) {
       let r = /^(http|https):\/\/[^ "]+$/;
       return r.test(url);
     },
-    async addSource() {
+    addSource() {
       if (this.testURL(this.sourceUrl)) {
-        await this.$root.spekti.ready;
-        await this.$root.spekti.rss.addSource(this.sourceUrl);
+        this.$store.dispatch("addRSS",this.sourceUrl);
         this.sourceUrl = "";
-        this.$root.$emit("update");
       } else {
         alert("This URL doesn't look right, please try again");
       }
     },
-    async removeSource(url) {
-      await this.$root.spekti.ready;
-      await this.$root.spekti.rss.removeSource(url);
-      this.$root.$emit("update");
+    removeSource(url) {
+      this.$store.dispatch("removeRSS",url);
     }
-  },
-  mounted: function() {
-    this.getSources();
   },
   props: ["update"],
 };
