@@ -1,8 +1,8 @@
 <template>
   <div class="modal-scroll">
     <ul class="sources list-group list-group-flush">
-      <li v-for="source in $store.state.rss" :key="source" class="list-group-item  d-flex justify-content-between align-items-center">
-        {{ sourceReplace(source) }}
+      <li v-for="(source, index) in $store.state.rss" :key="source" class="list-group-item  d-flex justify-content-between align-items-center">
+        <commit-link title="view only articles from this source" class="text-secondary text-decoration-none" :to="'/source/'+index" event="hideModal">{{ sourceReplace(source) }}</commit-link>
         <button class="badge badge-pill" title="Remove this source" v-on:click="removeSource(source)">
           <svg class="d-inline">
             <use xlink:href="/octicons-sprite/octicons-sprite.svg#trashcan-16"></use>
@@ -21,11 +21,15 @@
   </div>
 </template>
 <script>
+import commitLink from "@/components/commit-link.vue";
 export default {
   data: function() {
     return {
       sourceUrl: ""
     }
+  },
+  components: {
+    "commit-link": commitLink
   },
   watch: {
   },
@@ -43,7 +47,7 @@ export default {
   },
   methods: {
     sourceReplace(url) {
-      return url.replace(/^http[s]*:\/\/[www.]*/,"")
+      return url.replace(/^http[s]*:\/\/(www.)*/,"")
     },
     testURL(url) {
       let r = /^(http|https):\/\/[^ "]+$/;
