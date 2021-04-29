@@ -31,18 +31,15 @@ export default {
   data: function() {
     return {
       appName: "Spekti",
-      serviceWorker: false,
+      serviceWorker: true,
       modal: false,
     }
   },
   mounted() {
-    (async () => {
-      let online = await fetch(((process.env.NODE_ENV === "production") ? "/spekti":"") + "/online");
-      online = await online.text();
-      if (online.includes("true")) {
-        this.$store.dispatch("onlineAction", true);
-      }
-    })();
+    this.isOnline();
+    setInterval(() => {
+      this.isOnline();
+    },120000);
   },
   created() {
     if (this.serviceWorker) {
@@ -55,38 +52,26 @@ export default {
     "app-modal": modal,
   },
   methods: {
+    isOnline() {
+      (async () => {
+        let online = await fetch(((process.env.NODE_ENV === "production") ? "/spekti":"") + "/online");
+        online = await online.text();
+        this.$store.dispatch("onlineAction", online.includes("true"));
+      })();
+    },
     registerWorker() {
-      if('serviceWorker' in navigator) {
+      if("serviceWorker" in navigator) {
         navigator.serviceWorker.register(((process.env.NODE_ENV === "production") ? "/spekti":"") + "/service-worker.js")
           .then(e => e.update());
-        localStorage.setItem("synced",true);
         navigator.serviceWorker.onmessage = (e) => {
           let message = JSON.parse(e.data)
-          let keys = localStorage.getItem("spekti-keys") || "[]";
-          keys = JSON.parse(keys);
-          if (message.method == "GET") {
+          if (message.method == "GET") { //SW wants to retrieve data from LS
             message.body = {};
-            keys.map(e => {
-              message.body[e] = localStorage.getItem(e);
+            ["rss", "notes", "tags", "login", "gist", "status"].forEach(e => {
+              message.body[e] = localStorage.getItem(e) || "";
             });
-          } else if (message.method == "SYNC") {
-            message.body = {};
-            message.body.token = this.$root.logged;
-            message.body.gistId = this.$root.spekti.gist.id;
-          } else if (message.method == "CLEAR") {
-            localStorage.setItem("synced","true");
-          } else {
-            if ((!message.init)
-            || (localStorage.getItem("synced") === "true")) {
-              if (!keys.includes(message.key)) {
-                keys.push(message.key);
-                localStorage.setItem("spekti-keys", JSON.stringify(keys));
-              }
-              localStorage.setItem(message.key, message.body);
-              if (!message.init) {
-                localStorage.setItem("synced","false");
-              }
-            }
+          } else if (message.method == "SET") { //SW is setting data to LS
+            localStorage.setItem(message.key, message.body);
           }
           navigator.serviceWorker.controller.postMessage(JSON.stringify(message));
         };
