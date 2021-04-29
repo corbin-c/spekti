@@ -1,145 +1,139 @@
 <template>
-  <section v-bind:class="classes">
-      <article v-if="noSources" class="card"><p class="card-body">No source has been found. You can start <a href="#" v-on:click="showSources" title="add some content">adding some RSS feeds</a> now !</p></article>
-      <article-view v-if="singleArticle !== false" v-bind:content="singleArticle" v-bind:fullContent="(singleArticle !== false)"></article-view>
-      <article-view v-else v-for="article in articles" :key="article.url" v-bind:content="article" v-bind:fullContent="(singleArticle !== false)"></article-view>
+  <section :class="classes">
+    <h2 style="max-width: 100%; width: 100%; flex: 1 0 auto;" class="mb-3 col-12 text-secondary d-flex justify-content-between align-items-center" v-if="source">
+      Articles from {{ sourceReplace }} <router-link to="/" title="View articles from all sources" style="font-size: .5em;" class="small text-decoration-none text-info d-inline-block">All articles</router-link>
+    </h2>
+    <article v-if="noSources" class="card"><p class="card-body">No source has been found. You can start <a href="#" v-on:click="showSources" title="add some content">adding some RSS feeds</a> now !</p></article>
+    <article-card v-else v-for="article in articles" :key="article.url" v-bind:content="article"></article-card>
+    <div ref="scrollIndicator" style="max-width: 100%; width: 100%; flex: 1 0 auto; margin-top: 2rem; margin-bottom: 4rem;" class="d-flex justify-content-center">
+    <button v-if="moreContent" v-on:click="loadMore" class="btn btn-outline-info">Load more content…</button>
+    </div>
   </section>
 </template>
 <script>
-import { Spekti } from "@/spekti.js";
 import { Rss } from "@/rss.js";
-import { DataGists } from "@corbin-c/datagists/DataGists.js";
+import articleCard from "@/components/article-card.vue";
 
-import articleView from "./article.vue";
-
-const maxItemsOnPage = 12;
-      
 export default {
   data: function() {
     return {
-      maxItems: maxItemsOnPage,
-      ready: false,
-      noSources: false,
-      singleArticle: false,
-      allArticles: [],
-      tags: []
+      observer: null,
+      lastRSS: []
     }
   },
   computed: {
-    articles() {
-      let reviewed = this.tags
-        .filter(article => 
-          article.tags.includes("reviewed"))
+    moreContent() {
+      return (this.availableArticles.length > 0 && this.availableArticles.length > this.articles.length);
+    },
+    sourcesChanged() {
+      if (this.lastRSS.length !== this.rss.length) {
+        return true;
+      }
+      const sorted = [...this.rss].sort();
+      for (let index in sorted) {
+        if (this.lastRSS[index] !== sorted[index]) {
+          return true;
+        }
+      }
+      return false;
+    },
+    sourceReplace() {
+      if (this.rss[this.source]) {
+        return this.rss[this.source].replace(/^http[s]*:\/\/(www.)*/,"");
+      }
+      return "";
+    },
+    availableArticles() {
+      let reviewed = this.$store.getters.taggedContent("reviewed")
         .map(article => article.url);
-      return this.allArticles
-        .filter(article =>  !reviewed.includes(article.link))
-        .sort((a,b) => b.date - a.date).slice(0,this.maxItems);
+      return this.allArticles.filter(e => !reviewed.includes(e.link));
+    },
+    allArticles() {
+      if (this.source) {
+        return this.$store.state.articles.filter(e => e.source === this.rss[this.source]);
+      }
+      return this.$store.state.articles;
+    },
+    rss() {
+      return this.$store.state.rss;
+    },
+    noSources() {
+      return this.rss.length === 0;
+    },
+    articles() {
+      let lastItem = this.$store.state.lastItem[(this.source || "*")] || 12;
+      return [...this.availableArticles]
+        .sort((a,b) => b.date - a.date)
+        .slice(0,lastItem);
     },
     classes() {
       return {
-        "spinner-grow": !this.ready,
-        "text-info": !this.ready,
-        "row": this.ready && !this.noSources && !this.singleArticle,
-        "row-cols-1": this.ready && !this.noSources && !this.singleArticle,
-        "row-cols-sm-2": this.ready && !this.noSources && !this.singleArticle,
-        "row-cols-lg-3": this.ready && !this.noSources && !this.singleArticle,
-        "row-cols-xl-4": this.ready && !this.noSources && !this.singleArticle,
-        "mt-3": this.ready && !this.noSources,
-        "mb-5": this.ready && !this.noSources,
-        "text-center": this.ready && this.noSources,
-        "p-5": this.ready && this.noSources,
-        "m-3": this.ready && this.noSources
+        "row": !this.noSources,
+        "row-cols-1": !this.noSources,
+        "row-cols-sm-2": !this.noSources,
+        "row-cols-lg-3": !this.noSources,
+        "row-cols-xl-4": !this.noSources,
+        "mt-3": !this.noSources,
+        "mb-5": !this.noSources,
+        "text-center": this.noSources,
+        "p-5": this.noSources,
+        "m-3": this.noSources
       }
     }
   },
-  watch: {
-    update: function () {
+  components: {
+    "article-card": articleCard
+  },
+  mounted() {
+    this.loadContent();
+    this.$nextTick(function() {
+      const options = {
+        root: null,
+        rootMargin: "0px",
+        threshold: [0., 1.]
+      };
+      this.observer = new IntersectionObserver(this.handleIntersect, options);
+      this.observer.observe(this.$refs.scrollIndicator);
+    });
+  },
+  updated() {
+    if (this.sourcesChanged) {
       this.loadContent();
     }
   },
-  created() {
-    this.$on("showFullArticle",this.showArticle);
-    this.$root.$on("closeFullArticle",this.hideArticle);
-  },
-  components: {
-    "article-view": articleView
-  },
   methods: {
-    scroll () {
-      window.onscroll = () => {
-        if ((this.singleArticle === false) && (this.ready)) {
-          this.$root.scrollY = document.documentElement.scrollTop;
-          let bottomOfWindow = Math.max(
-            window.pageYOffset,
-            document.documentElement.scrollTop,
-            document.body.scrollTop)
-            + window.innerHeight;
-          if (bottomOfWindow 
-            >= document.documentElement.offsetHeight-window.innerHeight*0.075) {
-           this.maxItems += maxItemsOnPage;
-          }
-        }
+    loadMore() {
+      if (this.moreContent) {
+        this.$store.commit("incrementLastItem", this.source);
       }
     },
-    hideArticle() {
-      this.singleArticle = false;
-    },
-    showArticle(article) {
-      this.singleArticle = (this.singleArticle === article)
-        ?false
-        :article;
+    handleIntersect(event) {
+      if (event[0].isIntersecting) {
+        this.loadMore();
+      }
     },
     async loadContent () {
-      await this.$root.spekti.ready;
-      let rss = await this.$root.spekti.rss.allContent;
-      this.tags = await this.$root.spekti.tags.allContent
-      if (rss.length == 0) {
-        this.noSources = true;
-        this.allArticles = [];
-      } else {
-        this.noSources = false;
-        let feed = [];
-        rss.map(async (source) => {
-          source = new Rss(source);
-          await source.loadFeed();
-          feed = [...feed,...source.feed];
-          source.feed.map(feedItem => {
-            if (!this.allArticles.includes(feedItem)) {
-              this.allArticles.push(feedItem);
-            }
-            if (!this.ready) {
-              this.ready = true;
-            }
-          });
-          this.allArticles = this.allArticles
-            .filter(article => (feed.includes(article)))
-        });
+      if (this.noSources) {
+        return;
       }
+      this.lastRSS = [...this.rss].sort();
+      let feed = [];
+      await Promise.all(this.rss.map(async (source) => {
+        source = new Rss(source);
+        await source.loadFeed();
+        feed = [...feed, ...source.feed];
+        if (this.$store.state.articles.length == 0) {
+          //add the batch directly console.log("direct add"); 
+          this.$store.commit("newFeed",feed);
+        }
+      }));
+      this.$store.commit("newFeed",feed);
     },
-    showSources() {
+    showSources(e) {
+      e.preventDefault();
       this.$root.$emit("showModal","sources");
     }
   },
-  mounted: function() {
-    this.$nextTick(async function() {
-      let gist = new DataGists(this.$root.logged);
-      await gist.init();
-      let entities = [
-        { filename: "rss", type: "Sources" },
-        { filename: "tags", type: "Tags" },
-        { filename: "notes", type: "Notes" },
-      ];
-      this.$root.spekti = new Spekti(gist,entities);
-      this.loadContent();
-      this.scroll();
-      try {
-        await this.$root.spekti.ready;
-        navigator.serviceWorker.controller.postMessage("FORCE SYNC");
-      } catch {
-        console.log("not ready yet")
-      }
-    });
-  },
-  props: ["update"],
+  props: ["source"]
 };
 </script>
