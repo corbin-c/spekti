@@ -20,7 +20,7 @@
       </ul>
     </div>
     <div class="modal-footer bg-light">
-      <input type="text" class="form-control mx-auto" v-model="newNote" placeholder="New note">
+      <input type="text" ref="input" class="form-control mx-auto" v-model="newNote" placeholder="New note">
       <button type="button" class="btn btn-success" v-on:click="submitNote" v-bind:disabled="disabled">
         <svg class="d-inline">
           <use xlink:href="/octicons-sprite/octicons-sprite.svg#check-circle-24"></use>
@@ -34,54 +34,44 @@ export default {
   data: function() {
     return {
       newNote: "",
-      notes: [],
       edit: false
     }
   },
   computed: {
     allNotes() {
-      return this.notes;
+      return this.$store.getters.notesAbout(this.details.url);
     },
     disabled() {
       return (this.newNote.length == 0);
     },
   },
   methods: {
-    async submitNote() {
+    hideArticle() {
+      this.viewArticle = false;
+    },
+    submitNote() {
       if (this.edit === false) {
-        await this.addNote();
+        this.addNote();
       } else {
-        let content = this.newNote;
+        this.$store.dispatch("editNote", { content: this.newNote, id: this.edit, url: this.details.url });
         this.newNote = "";
-        await this.$root.spekti.ready;
-        await this.$root.spekti.notes.editNote(this.edit,content);
         this.edit = false;
       }
     },
-    async addNote() {
-      let content = this.newNote;
+    addNote() {
+      this.$store.dispatch("addNote", { content: this.newNote, url: this.details.url });
       this.newNote = "";
-      await this.$root.spekti.ready;
-      await this.$root.spekti.notes.makeNote(content,this.details);
+    },
+    deleteNote(id) {
+      this.edit = false;
       this.newNote = "";
-      this.getNotes();
+      this.$store.dispatch("removeNote", id);
     },
-    async deleteNote(id) {
-      await this.$root.spekti.ready;
-      await this.$root.spekti.notes.deleteNote(id);
-      this.getNotes();
-    },
-    async editNote(id,content) {
+    editNote(id,content) {
+      this.$refs.input.focus();
       this.edit = id;
       this.newNote = content;
     },
-    async getNotes() {
-      await this.$root.spekti.ready;
-      this.notes = await this.$root.spekti.notes.notesAbout(this.details);
-    },
-  },
-  mounted: function() {
-    this.getNotes();
   },
   props: ["update","details"],
 };
