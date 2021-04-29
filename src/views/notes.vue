@@ -1,18 +1,23 @@
 <template>
   <section class="mt-3 mb-5">
-    <article-view v-if="viewArticle !== false" v-bind:content="viewArticle" v-bind:fullContent="(viewArticle !== false)"></article-view>
-    <div class="card mb-3" v-else>
+    <div class="card mb-3">
       <h3 class="card-header card-title">Notes</h3>
       <p class="card-body card-text" v-if="$store.state.notes.length == 0">There is no note yet. Write your first note now!</p>
       <ul class="list-group list-group-flush" v-else>
         <li v-for="note in $store.state.notes" :key="note.id" class="list-group-item d-flex justify-content-between align-items-center">
         <span class="w-75">{{ note.content }}</span>
         <span>{{ (new Date(note.timestamp)).toLocaleDateString() }}</span>
-        <router-link v-bind:class="sourceClasses(note.url)" :to="note.url" title="View article linked with this note">
+        <commit-link
+          v-if="note.url"
+          to="/article"
+          :payload="{ link: note.url }"
+          statekey="currentArticle"
+          class="badge badge-pill badge-source"
+          title="View article linked with this note">
           <svg class="d-inline">
             <use xlink:href="/octicons-sprite/octicons-sprite.svg#link-16"></use>
           </svg>
-        </router-link>
+        </commit-link>
         <button class="badge-edit badge badge-pill" v-on:click="editNote(note.id,note.content)" title="Edit this note">
           <svg class="d-inline">
             <use xlink:href="/octicons-sprite/octicons-sprite.svg#pencil-16"></use>
@@ -26,7 +31,7 @@
         </li>
       </ul>
       <div class="card-footer bg-light d-flex justify-content-around align-items-center">
-        <textarea class="form-control" v-model="newNote" placeholder="New note"></textarea>
+        <textarea ref="input" class="form-control" v-model="newNote" placeholder="New note"></textarea>
         <button type="button" class="btn btn-success" v-on:click="submitNote" v-bind:disabled="disabled">
           <svg class="d-inline">
             <use xlink:href="/octicons-sprite/octicons-sprite.svg#check-circle-24"></use>
@@ -38,7 +43,7 @@
 </template>
 
 <script>
-import articleView from "./article.vue";
+import commitLink from "@/components/commit-link.vue";
 
 export default {
   data: function() {
@@ -54,7 +59,7 @@ export default {
     },
   },
   components: {
-    "article-view": articleView
+    "commit-link": commitLink
   },
   methods: {
     showArticle(target) {
@@ -66,34 +71,29 @@ export default {
         img: ""
       }
     },
-    sourceClasses(url) {
-      return {
-        "badge-source":true,
-        "badge": true,
-        "badge-pill": true,
-        "hidden": url === false
-      }
-    },
     hideArticle() {
       this.viewArticle = false;
     },
-    async submitNote() {
+    submitNote() {
       if (this.edit === false) {
-        await this.addNote();
+        this.addNote();
       } else {
         this.$store.dispatch("editNote", { content: this.newNote, id: this.edit });
         this.newNote = "";
         this.edit = false;
       }
     },
-    async addNote() {
+    addNote() {
       this.$store.dispatch("addNote", { content: this.newNote });
       this.newNote = "";
     },
-    async deleteNote(id) {
+    deleteNote(id) {
+      this.edit = false;
+      this.newNote = "";
       this.$store.dispatch("removeNote", id);
     },
-    async editNote(id,content) {
+    editNote(id,content) {
+      this.$refs.input.focus();
       this.edit = id;
       this.newNote = content;
     },
