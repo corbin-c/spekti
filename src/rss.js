@@ -57,7 +57,7 @@ let Rss = class {
   parseFeed(feed) {
     let items = [...feed.querySelectorAll("item")];
     for (let i of items) {
-      let element = {};
+      let element = { source: this.url };
       FEED_ELEMENTS.map(j => {
         element[Object.keys(j)[0]] = "";
         for (let k of j[Object.keys(j)[0]]) {
@@ -65,7 +65,7 @@ let Rss = class {
             element[Object.keys(j)[0]] = this.getElement(i,k);
             break;
           } catch {
-            console.warn("Missing element while building feed");
+            //~ console.warn("Missing element while building feed");
           }
         }
       });
@@ -99,7 +99,7 @@ let Rss = class {
           return this.getImage(content);
         }
       } catch {
-        console.warn("No image found");
+        //~ console.warn("No image found");
         return "";        
       }
     }
