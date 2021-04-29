@@ -5,10 +5,6 @@ let contentToCache = [
 "/spekti/index.html",
 "/spekti/manifest.json",
 "/spekti/spekti.css",
-"/spekti/js/app.69b9f378.js",
-"/spekti/js/app.69b9f378.js.map",
-"/spekti/js/chunk-vendors.761ab3f4.js",
-"/spekti/js/chunk-vendors.761ab3f4.js.map",
 "/spekti/logo/192.png",
 "/spekti/logo/512.png",
 "/spekti/logo/favicon.ico",
@@ -59,8 +55,8 @@ let Message = class {
   }
 }
 
-let localStorage = async (method,key=false,body=false,init=false) => {
-  let message = new Message({method,key,body,init});
+let localStorage = async (method,key=false,body=false) => {
+  let message = new Message({method,key,body});
   message = await message.send();
   return message.body;
 }
@@ -92,14 +88,9 @@ let fetchHandler = (request) => {
               && (request.method == "GET")) {
                 response.clone().json().then(json => {
                   Object.keys(json.files).map(key => {
-                    localStorage("SET",key,json.files[key].content,true);
+                    localStorage("SET",key,json.files[key].content);
                   })
-                  return localStorage("GET").then(storage => {
-                    Object.keys(json.files).map(key => {
-                      json.files[key].content = storage[key];
-                    });
-                    return new Response(JSON.stringify(json),response);
-                  });
+                return new Response(JSON.stringify(json),response);
                 });
               }
               if (request.method != "PATCH") {
@@ -147,38 +138,35 @@ let fetchHandler = (request) => {
   }
 };
 
-let syncGistStorage = (forced=false) => {
-  console.log("[SPEKTI SW] sync now !",forced);
+let syncGistStorage = () => {
+  console.log("[SPEKTI SW] sync now !");
   return new Promise((resolve,reject) => {
-    localStorage("SYNC").then(gist => {
-      if ((typeof gist.token === "boolean")
-      || (typeof gist.gistId === "undefined")) {
+    localStorage("GET").then(storage => {
+      if ((storage.login === "") || (storage.gist === "")) {
         reject(true);
       } else {
-        localStorage("GET").then(storage => {
-          Object.keys(storage).filter(key => {
-              return !(["gistId","token"].includes(key));
-            }).map(key => {
-            storage[key] = { content:storage[key] }
-          });
-          if (Object.keys(storage).length > 0) {
-            let headers = {
-              "Accept": "application/vnd.github.v3+json",
-              "Content-Type": "application/json",
-              "Authorization": "token "+gist.token
-            };
-            fetch("https://api.github.com/gists/"+gist.gistId, {
-              headers: headers,
-              method: "PATCH",
-              body: JSON.stringify({files:storage})
-            }).then(response => {
-              resolve(response);
-              localStorage("CLEAR");
-            });
-          } else {
-            reject(true);
+        let gist = {};
+        ["notes","rss","tags"].map(key => {
+          if (storage[key] !== "") {
+            gist[key] = { content:storage[key] }
           }
         });
+        if (Object.keys(gist).length > 0) {
+          let headers = {
+            "Accept": "application/vnd.github.v3+json",
+            "Content-Type": "application/json",
+            "Authorization": "token "+storage.login
+          };
+          fetch("https://api.github.com/gists/"+storage.gist, {
+            headers: headers,
+            method: "PATCH",
+            body: JSON.stringify({files:gist})
+          }).then(response => {
+            resolve(response);
+          });
+        } else {
+          reject(true);
+        }
       }
     });
   });
@@ -230,13 +218,17 @@ self.addEventListener("activate", (e) => {
   console.log("[SPEKTI SW] Activated !");
   clearCache();
 });
-self.addEventListener("message", (e) => {
-  if (e.data == "FORCE SYNC") {
-    syncGistStorage(true);
-    checkCache();
-    clearCache();
+self.addEventListener("message", async (e) => {
+  let data = JSON.parse(e.data)
+  if (typeof data.online !== "undefined") {
+    if (data.online) {
+      let wasOnline = (await localStorage("SET","status")).online;
+      if (wasOnline === false) {
+        await syncGistStorage();
+      }
+    }
+    localStorage("SET","status",data.online);
   } else {
-    let data = JSON.parse(e.data)
     messages.find(e => e.id == data.id).responseReceived(data);
   }
 });
