@@ -1,6 +1,6 @@
 <template>
   <transition name="fade">
-    <div v-if="this.content">
+    <div v-if="this.component">
       <aside class="modal d-block" tabindex="-1" v-on:click="hide">
         <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable" id="dialog">
           <div class="modal-content">
@@ -10,7 +10,7 @@
                   <span aria-hidden="true">&times;</span>
                 </button>
             </div>
-            <component v-bind:is="currentComponent" v-bind:update="update" v-bind:details="details"></component>
+            <component v-bind:is="currentComponent" v-bind:details="details"></component>
           </div>
         </div>
       </aside>
@@ -26,16 +26,16 @@ import notesAbout from "@/components/notesabout.vue";
 export default {
   computed: {
     title() {
-      if (this.content == "tags-about") {
+      if (this.component == "tags-about") {
         return "tags about this article"
-      } else if (this.content == "notes-about") {
+      } else if (this.component == "notes-about") {
         return "notes about this article"
       }
-      return this.content;
+      return this.component;
     },
     currentComponent() {
-      if (["sources","tags","tags-about","notes-about"].indexOf(this.content) >= 0) {
-        return this.content+"-view"        
+      if (["sources","tags","tags-about","notes-about"].indexOf(this.component) >= 0) {
+        return this.component+"-view"        
       }
       return false;
     }
@@ -56,6 +56,6 @@ export default {
       this.$root.$emit("hideModal","");
     }
   },
-  props: ["content", "update", "details"],
+  props: ["component", "details"],
 };
 </script>

@@ -4,10 +4,10 @@
       <router-link to="/" class="text-decoration-none" title="Go back to articles list"><h2 class="text-info">{{ appName }}</h2></router-link>
       <ul class="navbar-nav ml-auto" v-if="$root.spekti !== false">
         <li class="nav-item">
-          <a class="nav-link" title="Manage sources" v-on:click="setModal('sources')">Sources</a>
+          <a class="nav-link" title="Manage sources" v-on:click="setModal( { component: 'sources' })">Sources</a>
         </li>
         <li class="nav-item">
-          <a class="nav-link" title="Manage tags" v-on:click="setModal('tags')">Tags</a>
+          <a class="nav-link" title="Manage tags" v-on:click="setModal( { component: 'tags' })">Tags</a>
         </li>
         <li class="nav-item">
           <router-link class="nav-link" to="/notes" title="Manage notes">Notes</router-link>
@@ -15,7 +15,7 @@
       </ul>
     </nav>
     <router-view />
-    <app-modal v-bind:content="modal" v-bind:details="modalDetails" />
+    <app-modal v-bind:component="modal.component" v-bind:details="modal.details" />
     <footer class="fixed-bottom text-right border-top border-info p-1 bg-light">
       <small class="p-2">
         <a href="https://github.com/corbin-c/spekti" title="Spekti repository by corbin-c on Github">Contribute on Github</a>
@@ -33,14 +33,12 @@ export default {
       appName: "Spekti",
       serviceWorker: false,
       modal: false,
-      modalDetails: false,
     }
   },
   mounted() {
     (async () => {
       let online = await fetch(((process.env.NODE_ENV === "production") ? "/spekti":"") + "/online");
       online = await online.text();
-      console.log(online.includes("true"));
       if (online.includes("true")) {
         this.$store.dispatch("onlineAction", true);
       }
@@ -51,6 +49,7 @@ export default {
       this.registerWorker();
     }
     this.$root.$on("hideModal",this.hideModal);
+    this.$root.$on("showModal",this.setModal);
   },
   components: {
     "app-modal": modal,
@@ -99,12 +98,8 @@ export default {
     setModal(target) {
       this.modal = target;
     },
-    setModalDetails(target) {
-      this.modalDetails = target;
-    },
     hideModal() {
       this.setModal(false);
-      this.setModalDetails(false);
     },
   }
 };
