@@ -2,7 +2,7 @@
   <div id="app" class="container-fluid">
     <nav class="row navbar sticky-top navbar-expand navbar-light bg-light border-bottom border-info">
       <router-link to="/" class="text-decoration-none" title="Go back to articles list"><h2 class="text-info">{{ appName }}</h2></router-link>
-      <ul class="navbar-nav ml-auto" v-if="$root.spekti !== false">
+      <ul class="navbar-nav ml-auto" v-if="$store.state.connected !== false">
         <li class="nav-item">
           <a class="nav-link" title="Manage sources" v-on:click="setModal( { component: 'sources' })">Sources</a>
         </li>
@@ -16,7 +16,12 @@
     </nav>
     <router-view />
     <app-modal v-bind:component="modal.component" v-bind:details="modal.details" />
-    <footer class="fixed-bottom text-right border-top border-info p-1 bg-light">
+    <footer class="fixed-bottom text-right border-top border-info bg-light d-flex justify-content-between">
+      <small class="p-2">
+        <a v-if="$store.state.connected" class="text-danger" title="Logout from Spekti" v-on:click="logout">
+          Logout
+        </a>
+      </small>
       <small class="p-2">
         <a href="https://github.com/corbin-c/spekti" title="Spekti repository by corbin-c on Github">Contribute on Github</a>
       </small>
@@ -26,16 +31,21 @@
 
 <script>
 import modal from "./components/modal.vue";
+
 export default {
   name: 'App',
   data: function() {
     return {
       appName: "Spekti",
-      serviceWorker: true,
+      serviceWorker: false,
       modal: false,
     }
   },
   mounted() {
+    let path = window.location.search.split("?path")[1];
+    if (typeof path !== "undefined") {
+      this.$router.push({path});
+    }
     this.isOnline();
     setInterval(() => {
       this.isOnline();
@@ -52,6 +62,11 @@ export default {
     "app-modal": modal,
   },
   methods: {
+    logout(e) {
+      e.preventDefault();
+      localStorage.clear();
+      this.$store.commit("logoff");
+    },
     isOnline() {
       (async () => {
         let online = await fetch(((process.env.NODE_ENV === "production") ? "/spekti":"") + "/online");
