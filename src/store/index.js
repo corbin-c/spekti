@@ -14,9 +14,25 @@ export default new Vuex.Store({
     tags: [],
     notes: [],
     rss: [],
-    articles: []
+    articles: [],
+    lastItem: {},
+    currentArticle: {}
   },
   mutations: {
+    incrementLastItem(state, source) {
+      if (typeof source === "undefined") {
+        source = "*"
+      }
+      state.lastItem = {...state.lastItem, [source]:(state.lastItem[source] || 12)+12};
+    },
+    newFeed(state, feed) {
+      feed = feed.filter(article => {
+        return (!state.articles.some(e => e.link == article.link))
+      });
+      if (feed.length > 0) {
+        state.articles = [...state.articles,...feed];
+      }
+    },
     add(state, { key, content }) {
       state[key].push(content);
     },
@@ -81,7 +97,7 @@ export default new Vuex.Store({
           gist = await gist.useGist({description:GIST_DESC});
         }
         commit("connected",true);
-        console.info("connected to gist",gist);
+        console.info("connected to gist");
         Object.keys(gist.files).forEach(key => { //populate store & localStorage with retrieved objects
           if (["tags","notes","rss"].includes(key)) {
             const content = gist.files[key].content;
@@ -211,8 +227,11 @@ export default new Vuex.Store({
     },
   },
   getters: {
+    notesAbout: (state) => (url) => {
+      return state.notes.filter(e => e.url == url) || [];
+    },
     tagsAbout: (state) => (url) => {
-      return state.tags.find(e => e.url == url);
+      return state.tags.find(e => e.url == url) || [];
     },
     otherTags: (state) => (url,tag) => {
       try {
@@ -224,7 +243,18 @@ export default new Vuex.Store({
       }
     },
     taggedContent: (state) => (tag) => {
-      return state.tags.filter(article => article.tags.includes(tag));
+      return state.tags.filter(article => article.tags.includes(tag)) || [];
+    },
+    allTags: (state) => {
+      let all = ["fav","reviewed"];
+      state.tags.forEach(article => {
+        article.tags.map(tag => {
+          if (!all.some(e => e==tag)) {
+            all.push(tag);
+          }
+        });
+      });
+      return all;
     }
   }
 })
