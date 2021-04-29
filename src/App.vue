@@ -37,7 +37,7 @@ export default {
   data: function() {
     return {
       appName: "Spekti",
-      serviceWorker: false,
+      serviceWorker: true,
       modal: false,
     }
   },
