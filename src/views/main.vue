@@ -131,7 +131,7 @@ export default {
     },
     showSources(e) {
       e.preventDefault();
-      this.$root.$emit("showModal","sources");
+      this.$root.$emit("showModal", { component: "sources" });
     }
   },
   props: ["source"]
