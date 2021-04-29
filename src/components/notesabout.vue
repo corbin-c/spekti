@@ -46,9 +46,6 @@ export default {
     },
   },
   methods: {
-    hideArticle() {
-      this.viewArticle = false;
-    },
     submitNote() {
       if (this.edit === false) {
         this.addNote();
