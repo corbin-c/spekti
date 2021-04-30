@@ -92,7 +92,11 @@ export default {
           navigator.serviceWorker.controller.postMessage(JSON.stringify(message));
         };
         navigator.serviceWorker.ready.then(swRegistration => {
-          return swRegistration.sync.register('gistSync');
+          try {
+            return swRegistration.sync.register('gistSync');
+          } catch {
+            console.warn("navigator doesn't handle sync method");
+          }
         });
       }
     },

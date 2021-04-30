@@ -134,7 +134,7 @@ export default new Vuex.Store({
           }
         }
       }
-      informSW();
+      informSW(value);
     },
     gistChange({commit, state}, { type, key, content, filter, find }) {
       commit(type, { key, content, filter, find });
