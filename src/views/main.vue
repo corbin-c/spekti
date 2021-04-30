@@ -23,7 +23,7 @@ export default {
   },
   computed: {
     moreContent() {
-      return (!noSources && this.availableArticles.length > 0 && this.availableArticles.length > this.articles.length);
+      return (!this.noSources && this.availableArticles.length > 0 && this.availableArticles.length > this.articles.length);
     },
     sourcesChanged() {
       if (this.lastRSS.length !== this.rss.length) {
