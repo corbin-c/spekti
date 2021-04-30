@@ -70,9 +70,9 @@ export default {
     },
     isOnline() {
       (async () => {
-        let online = await fetch(((process.env.NODE_ENV === "production") ? "/spekti":"") + "/online");
+        let online = await fetch(((process.env.NODE_ENV === "production") ? "/spekti":"") + "/online?" + (new Date()).valueOf());
         online = await online.text();
-        this.$store.dispatch("onlineAction", online.includes("true"));
+        this.$store.dispatch("onlineAction", (online !== "false"));
       })();
     },
     registerWorker() {
