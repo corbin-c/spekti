@@ -14,7 +14,7 @@
               {{ article.title }}
           </commit-link>
           <router-link
-            class="badge badge-info badge-pill"
+            class="badge badge-info badge-pill mx-1"
             v-for="otherTag in $store.getters.otherTags(article.url,tag)"
             :key="otherTag"
             :title="'View more articles with this tag: '+otherTag"
