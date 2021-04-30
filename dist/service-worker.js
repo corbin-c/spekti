@@ -1,8 +1,7 @@
-let cacheName = "spekti-v7";
+let cacheName = "spekti-v8";
 let path = "/spekti/";
 let contentToCache = [
 path+"",
-path+"online",
 path+"index.html",
 path+"manifest.json",
 path+"spekti.css",
