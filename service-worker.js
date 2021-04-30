@@ -1,15 +1,16 @@
-let cacheName = "spekti-v6";
+let cacheName = "spekti-v7";
+let path = "/spekti/";
 let contentToCache = [
-"/spekti/",
-"/spekti/online",
-"/spekti/index.html",
-"/spekti/manifest.json",
-"/spekti/spekti.css",
-"/spekti/logo/192.png",
-"/spekti/logo/512.png",
-"/spekti/logo/favicon.ico",
-"/spekti/logo/logo.svg",
-"/spekti/logo/maskable.png",
+path+"",
+path+"online",
+path+"index.html",
+path+"manifest.json",
+path+"spekti.css",
+path+"logo/192.png",
+path+"logo/512.png",
+path+"logo/favicon.ico",
+path+"logo/logo.svg",
+path+"logo/maskable.png",
 "/octicons-sprite/octicons-sprite.svg",
 "https://maxcdn.bootstrapcdn.com/bootstrap/4.5.0/css/bootstrap.min.css",
 ];
@@ -71,7 +72,7 @@ let fetchHandler = (request) => {
       });
     });
   }
-  if (request.url.indexOf("/spekti/online") < 0) { //all requests except special "online" request, used to test connectivty
+  if (request.url.indexOf(path+"online") < 0) { //all requests except special "online" request, used to test connectivty
     return caches.match(request).then((r) => {
       //~ console.log("[SPEKTI SW] Fetching...: "+request.url);
       if ((r)
@@ -222,8 +223,8 @@ self.addEventListener("message", async (e) => {
   let data = JSON.parse(e.data)
   if (typeof data.online !== "undefined") {
     if (data.online) {
-      let wasOnline = (await localStorage("SET","status")).online;
-      if (wasOnline === false) {
+      let wasOnline = (await localStorage("GET")).status;
+      if (wasOnline === "false") {
         await syncGistStorage();
       }
     }
