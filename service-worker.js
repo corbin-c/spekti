@@ -1,6 +1,6 @@
-let cacheName = "spekti-v8";
-let path = "/spekti/";
-let contentToCache = [
+const cacheName = "spekti-v9";
+const path = "/spekti/";
+const contentToCache = [
 path+"",
 path+"index.html",
 path+"manifest.json",
@@ -13,11 +13,11 @@ path+"logo/maskable.png",
 "/octicons-sprite/octicons-sprite.svg",
 "https://maxcdn.bootstrapcdn.com/bootstrap/4.5.0/css/bootstrap.min.css",
 ];
-
+console.log = () => {};
 let messages = [];
 
 let clearCache = (force=false) => {
-  console.log("[SPEKTI SW] Clearing cache...");
+  console.log("Clearing cache...");
   if (!force) {
     console.log("Cache to keep:",cacheName);
   }
@@ -42,6 +42,7 @@ let Message = class {
     messages.push(this);
   }
   async send() {
+    console.log("sending message",this.content);
     self.clients.matchAll().then((clients) => {
       if (clients && clients.length) {
         clients.map(client => {
@@ -64,6 +65,7 @@ let localStorage = async (method,key=false,body=false) => {
 let fetchHandler = (request) => {
   if ((request.method == "PATCH") //intercept PATCH requests to save body before sending them
   && (request.url.indexOf("api.github.com/gists/") > 0)) {
+    console.log("Intercepting patch request");
     request.clone().text().then(json => {
       json = JSON.parse(json);
       Object.keys(json.files).map(key => {
@@ -71,75 +73,76 @@ let fetchHandler = (request) => {
       });
     });
   }
-  if (request.url.indexOf(path+"online") < 0) { //all requests except special "online" request, used to test connectivty
-    return caches.match(request).then((r) => {
-      //~ console.log("[SPEKTI SW] Fetching...: "+request.url);
-      if ((r)
-      && (request.url.indexOf("api.github.com") < 0)
-      && (!request.headers.has("spekti-no-cache"))) { //serve cached resources except RSS feeds & github api responses
-        //~ console.log("[SPEKTI SW] Serving cached resource...: "+request.url);
-        return r;
-      } else { //when resource not in cache
-        return fetch(request).then((response) => {
-          if ((response.status >= 200) && (response.status < 300)) {
-            return caches.open(cacheName).then((cache) => {
-              //~ console.log("[SPEKTI SW] Caching newly fetched resource: "+request.url);
-              if ((request.url.indexOf("api.github.com/gists/") > 0)
-              && (request.method == "GET")) {
-                response.clone().json().then(json => {
-                  Object.keys(json.files).map(key => {
-                    localStorage("SET",key,json.files[key].content);
-                  })
-                return new Response(JSON.stringify(json),response);
+  return caches.match(request).then((r) => {
+    if ((r)
+    && (request.url.indexOf("api.github.com") < 0)
+    && (request.url.indexOf(path+"online") < 0)
+    && (!request.headers.has("spekti-no-cache"))) { //serve cached resources except RSS feeds & github api responses
+      console.log("Serving cached resource",request.url);
+      return r;
+    } else { //when resource not in cache
+      return fetch(request).then((response) => {
+        console.log("trying to fetch",request.url);
+        if ((response.status >= 200) && (response.status < 300)) {
+          return caches.open(cacheName).then((cache) => {
+            if (request.url.indexOf(path+"online") >= 0) {
+              console.log("intercepting connectivity request");
+              return response.clone().text().then(text => {
+                return new Response("true",response);
+              });
+            }
+            if ((request.url.indexOf("api.github.com/gists/") > 0)
+            && (request.method == "GET")) {
+              console.log("intercepting gist request to fill localstorage");
+              response.clone().json().then(json => {
+                Object.keys(json.files).map(key => {
+                  localStorage("SET",key,json.files[key].content);
+                })
+              });
+            }
+            if (request.method != "PATCH") {
+              console.log("Caching newly fetched resource:",request.url);
+              cache.put(request, response.clone());
+            }
+            return response;
+          });
+        } else {
+          return response;
+        }
+      }).catch(() => {
+        return caches.match(request,{ignoreVary:true}).then((r) => { //when offline, always try to serve cached resource
+          console.log("offline fallback");
+          if (request.url.indexOf(path+"online") >= 0) {
+            console.log("intercepting connectivity request / offline");
+            return new Response("false",r);
+          }
+          if (r) {
+            if (request.url.indexOf("api.github.com/gists/") > 0) {
+              if (request.method == "GET") {
+                console.log("serving localStorage to mimic gist API");
+                return localStorage("GET").then(storage => {
+                  return r.json().then(json => {
+                    Object.keys(json.files).map(key => {
+                      json.files[key].content = storage[key];
+                    });
+                    return new Response(JSON.stringify(json),r);
+                  });
                 });
               }
-              if (request.method != "PATCH") {
-                cache.put(request, response.clone());
-              }
-              return response;
-            });
-          } else {
-            return response;
-          }
-        }).catch(() => {
-          return caches.match(request,{ignoreVary:true}).then((r) => { //when offline, always try to serve cached resource
-            if (r) {
-              if (request.url.indexOf("api.github.com/gists/") > 0) {
-                if (request.method == "GET") {
-                  return localStorage("GET").then(storage => {
-                    return r.json().then(json => {
-                      Object.keys(json.files).map(key => {
-                        json.files[key].content = storage[key];
-                      });
-                      return new Response(JSON.stringify(json),r);
-                    });
-                  });
-                }
-              } else {
-                return r;
-              }
+            } else {
+              console.log("Serving cached resource",request.url);
+              return r;
             }
-          })
+          }
+          return new Response("Not found", { status: 404 });
         });
-      }
-    });
-  } else {
-    return fetch(request).then((response) => {
-      console.log("[SPEKTI SW] Working online !");
-      return response;
-    }).catch(() => {
-      return caches.match(request).then((r) => {
-        if (r) {
-          console.log("[SPEKTI SW] Working offline :/");
-          return new Response("false", r);
-        }
-      })
-    })
-  }
+      });
+    }
+  });
 };
 
 let syncGistStorage = () => {
-  console.log("[SPEKTI SW] sync now !");
+  console.log("sync now !");
   return new Promise((resolve,reject) => {
     localStorage("GET").then(storage => {
       if ((storage.login === "") || (storage.gist === "")) {
@@ -191,17 +194,17 @@ let checkCache = async () => {
     await Promise.all(sizePromises);
     return total;
   })();
-  console.log("[SPEKTI SW] Cache Size is:",cacheSize);
+  console.log("Cache Size is:",cacheSize);
   if (cacheSize > 100000000) {
     clearCache(true);
   }
 }
 
 self.addEventListener("install", (e) => {
-  console.log("[SPEKTI SW] Installation");
+  console.log("Installation");
   e.waitUntil(
     caches.open(cacheName).then((cache) => {
-      console.log("[SPEKTI SW] Global caching");
+      console.log("Global caching");
       return cache.addAll(contentToCache);
     })
   );
@@ -215,18 +218,21 @@ self.addEventListener("sync", (e) => {
   }
 });
 self.addEventListener("activate", (e) => {
-  console.log("[SPEKTI SW] Activated !");
+  console.log("Activated !");
   clearCache();
 });
 self.addEventListener("message", async (e) => {
+  console.log("message received",e.data);
   let data = JSON.parse(e.data)
   if (typeof data.online !== "undefined") {
     if (data.online) {
       let wasOnline = (await localStorage("GET")).status;
       if (wasOnline === "false") {
+        console.log("back online! let's sync");
         await syncGistStorage();
       }
     }
+    console.log("setting online status",data.online);
     localStorage("SET","status",data.online);
   } else {
     messages.find(e => e.id == data.id).responseReceived(data);
