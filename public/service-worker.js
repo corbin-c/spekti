@@ -1,4 +1,4 @@
-const cacheName = "spekti-v8";
+const cacheName = "spekti-v9";
 const path = "/spekti/";
 const contentToCache = [
 path+"",
