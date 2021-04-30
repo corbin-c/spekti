@@ -1,44 +1,49 @@
 <template>
   <section class="mt-3 mb-5">
-    <div class="card mb-3">
-      <h3 class="card-header card-title">Notes</h3>
-      <p class="card-body card-text" v-if="$store.state.notes.length == 0">There is no note yet. Write your first note now!</p>
-      <ul class="list-group list-group-flush" v-else>
-        <li v-for="note in $store.state.notes" :key="note.id" class="list-group-item d-flex justify-content-between align-items-center">
-        <span class="w-75">{{ note.content }}</span>
-        <span>{{ (new Date(note.timestamp)).toLocaleDateString() }}</span>
-        <commit-link
-          v-if="note.url"
-          to="/article"
-          :payload="{ link: note.url }"
-          statekey="currentArticle"
-          class="badge badge-pill badge-source"
-          title="View article linked with this note">
-          <svg class="d-inline">
-            <use xlink:href="/octicons-sprite/octicons-sprite.svg#link-16"></use>
-          </svg>
-        </commit-link>
-        <button class="badge-edit badge badge-pill" v-on:click="editNote(note.id,note.content)" title="Edit this note">
-          <svg class="d-inline">
-            <use xlink:href="/octicons-sprite/octicons-sprite.svg#pencil-16"></use>
-          </svg>
-        </button>
-        <button class="badge-delete badge badge-pill" v-on:click="deleteNote(note.id)" title="Delete this note">
-          <svg class="d-inline">
-            <use xlink:href="/octicons-sprite/octicons-sprite.svg#trashcan-16"></use>
-          </svg>
-        </button>
-        </li>
-      </ul>
-      <div class="card-footer bg-light d-flex justify-content-around align-items-center">
+    <table class="card mb-3">
+      <thead class="h3 card-header card-title">Notes</thead>
+      <tbody class="card-body card-text" v-if="$store.state.notes.length == 0">There is no note yet. Write your first note now!</tbody>
+      <tbody class="list-group list-group-flush" v-else>
+        <tr v-for="note in $store.state.notes" :key="note.id" class="list-group-item">
+        <td>{{ note.content }}</td>
+        <td class="pl-1">{{ (new Date(note.timestamp)).toLocaleDateString() }}</td>
+        <td class="pl-2">
+          <commit-link
+            to="/article"
+            :payload="{ link: note.url }"
+            statekey="currentArticle"
+            :class="'badge badge-pill badge-source ' + ((note.url) ? 'visible':'invisible')"
+            title="View article linked with this note">
+            <svg class="d-inline">
+              <use xlink:href="/octicons-sprite/octicons-sprite.svg#link-16"></use>
+            </svg>
+          </commit-link>
+        </td>
+        <td class="pl-1">
+          <button class="badge-edit badge badge-pill" v-on:click="editNote(note.id,note.content)" title="Edit this note">
+            <svg class="d-inline">
+              <use xlink:href="/octicons-sprite/octicons-sprite.svg#pencil-16"></use>
+            </svg>
+          </button>
+        </td>
+        <td class="pl-1">
+          <button class="badge-delete badge badge-pill" v-on:click="deleteNote(note.id)" title="Delete this note">
+            <svg class="d-inline">
+              <use xlink:href="/octicons-sprite/octicons-sprite.svg#trashcan-16"></use>
+            </svg>
+          </button>
+        </td>
+        </tr>
+      </tbody>
+      <tfoot class="card-footer bg-light d-flex justify-content-around align-items-center">
         <textarea ref="input" class="form-control" v-model="newNote" placeholder="New note"></textarea>
         <button type="button" class="btn btn-success" v-on:click="submitNote" v-bind:disabled="disabled">
           <svg class="d-inline">
             <use xlink:href="/octicons-sprite/octicons-sprite.svg#check-circle-24"></use>
           </svg>
         </button>
-      </div>
-    </div>
+      </tfoot>
+    </table>
   </section>
 </template>
 
