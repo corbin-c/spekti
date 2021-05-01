@@ -46,7 +46,11 @@
     </table>
   </section>
 </template>
-
+<style scoped>
+td {
+  width: 100%;
+}
+</style>
 <script>
 import commitLink from "@/components/commit-link.vue";
 
